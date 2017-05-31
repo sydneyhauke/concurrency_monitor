@@ -1,7 +1,6 @@
 #ifndef PSEMAPHORE_H
 #define PSEMAPHORE_H
 
-#include <QSemaphore>
 
 class OSemaphore
 {

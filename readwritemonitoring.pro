@@ -15,7 +15,19 @@ SOURCES += src/main.cpp\
     src/omutex.cpp \
     src/osemaphore.cpp \
     src/owaitcondition.cpp \
-    src/ohoaremonitor.cpp
+    src/ohoaremonitor.cpp \
+    src/readerwriterprioreadersem.cpp \
+    src/readerwriterpriowritersem.cpp \
+    src/readerwriterequalsem.cpp \
+    src/readerwriterpriowritermut.cpp \
+    src/readerwriterequalmut.cpp \
+    src/readerwriterprioreadercond.cpp \
+    src/readerwriterpriowritercond.cpp \
+    src/readerwriterequalcond.cpp \
+    src/readerwriterprioreaderhoare.cpp \
+    src/readerwriterpriowriterhoare.cpp \
+    src/readerwriterequalhoare.cpp \
+    src/readerwriterprioreadermut.cpp
 
 HEADERS  +=  \
     src/waitinglogger.h \
@@ -23,4 +35,17 @@ HEADERS  +=  \
     src/omutex.h \
     src/osemaphore.h \
     src/owaitcondition.h \
-    src/ohoaremonitor.h
+    src/ohoaremonitor.h \
+    src/ireaderwriter.h \
+    src/readerwriterprioreadersem.h \
+    src/readerwriterpriowritersem.h \
+    src/readerwriterequalsem.h \
+    src/readerwriterpriowritermut.h \
+    src/readerwriterequalmut.h \
+    src/readerwriterprioreadercond.h \
+    src/readerwriterpriowritercond.h \
+    src/readerwriterequalcond.h \
+    src/readerwriterprioreaderhoare.h \
+    src/readerwriterpriowriterhoare.h \
+    src/readerwriterequalhoare.h \
+    src/readerwriterprioreadermut.h
