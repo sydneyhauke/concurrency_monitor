@@ -18,14 +18,21 @@ readerwriterprioreaderSem::lockReader() {
 }
 
 readerwriterprioreaderSem::unlockReader() {
-
+    mutexReaders.acquire();
+    nbReaders--;
+    if (nbReaders == 0) {
+        writer.release();
+    }
+    mutexReaders.release();
 }
 
 readerwriterprioreaderSem::lockWriter() {
-
+    mutexWriters.acquire();
+    writer.acquire();
 }
 
 readerwriterprioreaderSem::unlockWriter() {
-
+    writer.release();
+    mutexWriters.release();
 }
 
