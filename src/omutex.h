@@ -7,7 +7,7 @@ class OMutex
 
 private:
     QMutex mutex;
-    bool stopped;
+    bool locked;
 
 public:
     OMutex();
@@ -17,6 +17,10 @@ public:
     bool tryLock();
 
     void unlock();
+
+    bool getState();
+
+    QMutex* getMutex();
 };
 
 #endif // PMUTEX_H

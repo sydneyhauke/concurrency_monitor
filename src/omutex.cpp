@@ -1,8 +1,6 @@
 #include "omutex.h"
 
-OMutex::OMutex()
-{
-    mutex = new QMutex();
+OMutex::OMutex() : mutex() {
     locked = false;
 }
 
@@ -38,7 +36,7 @@ bool OMutex::getState()
     return locked;
 }
 
-QMutex OMutex::getMutex()
+QMutex* OMutex::getMutex()
 {
-    return mutex;
+    return &mutex;
 }
