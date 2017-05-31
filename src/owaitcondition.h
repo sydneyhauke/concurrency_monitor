@@ -1,10 +1,14 @@
 #ifndef PWAITCONDITION_H
 #define PWAITCONDITION_H
 
+#include <QWaitCondition>
 #include "omutex.h"
 
 class OWaitCondition
 {
+private:
+    QWaitCondition cond;
+
 public:
     OWaitCondition();
 
