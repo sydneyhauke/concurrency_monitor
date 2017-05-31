@@ -5,6 +5,10 @@
 
 class OSemaphore
 {
+private:
+    QSemaphore sem;
+    int v;
+
 public:
     OSemaphore(int n = 0);
 
@@ -13,6 +17,8 @@ public:
     void release();
 
     bool tryAcquire();
+
+    int semVal();
 };
 
 #endif // PSEMAPHORE_H
