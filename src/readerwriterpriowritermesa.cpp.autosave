@@ -1,0 +1,8 @@
+#include "readerwriterpriowritermesa.h"
+
+readerwriterpriowritermesa::readerwriterpriowritermesa()
+{
+
+}
+
+readerwriterpriowritermesa

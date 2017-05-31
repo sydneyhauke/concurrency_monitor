@@ -8,7 +8,7 @@ readerwriterprioreaderSem::readerwriterprioreaderSem() :
     nbReaders(0)
 {}
 
-readerwriterprioreaderSem::lockReader() {
+virtual void readerwriterprioreaderSem::lockReader() {
     mutexReaders.acquire();
     nbReaders++;
     if (nbReader == 1) {
@@ -17,7 +17,7 @@ readerwriterprioreaderSem::lockReader() {
     mutexReaders.release();
 }
 
-readerwriterprioreaderSem::unlockReader() {
+virtual void readerwriterprioreaderSem::unlockReader() {
     mutexReaders.acquire();
     nbReaders--;
     if (nbReaders == 0) {
@@ -26,12 +26,12 @@ readerwriterprioreaderSem::unlockReader() {
     mutexReaders.release();
 }
 
-readerwriterprioreaderSem::lockWriter() {
+virtual void readerwriterprioreaderSem::lockWriter() {
     mutexWriters.acquire();
     writer.acquire();
 }
 
-readerwriterprioreaderSem::unlockWriter() {
+virtual void readerwriterprioreaderSem::unlockWriter() {
     writer.release();
     mutexWriters.release();
 }
