@@ -1,6 +1,7 @@
 #ifndef READERWRITERPRIOREADERMESA_H
 #define READERWRITERPRIOREADERMESA_H
 
+#include "omutex.h"
 #include "ireaderwriter.h"
 #include "owaitcondition.h"
 
