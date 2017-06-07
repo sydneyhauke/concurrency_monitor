@@ -1,15 +1,22 @@
 #ifndef OHOAREMONITOR_H
 #define OHOAREMONITOR_H
 
-
+#include "osemaphore.h"
 class OHoareMonitor
 {
 protected:
-
-    class Condition;
+    OHoareMonitor();
+    class Condition
+    {
+        friend OHoareMonitor;
+    public:
+        Condition();
+    private :
+        OSemaphore waitingOSem;
+        int nbWaiting;
+    };
 
 public:
-    OHoareMonitor();
 
     /**
      * This function has to be called at the beginning of each function being
@@ -37,6 +44,15 @@ public:
      * the other one to finish.
      */
     void signal(Condition &cond);
+
+private:
+
+    //! Mutex for the protecting the entire monitor
+    OSemaphore monitorMutex;
+    //! Blocking semaphore for the thread doing a signal(condition)
+    OSemaphore monitorSignale;
+    //! Number of threads waiting on the semaphore monitorSignale
+    int monitorNbSignale;
 
 };
 
