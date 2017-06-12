@@ -3,9 +3,11 @@
 
 #include <QStringList>
 #include <QList>
+#include <QMutex>
 
 class WaitingQueue
 {
+public:
     QString name;
     QStringList threadNames;
 };
@@ -42,8 +44,10 @@ protected:
      */
     virtual void updateView();
 
-    QList<WaitingQueue *> queues;
+    QList<WaitingQueue *> waitingQueues;
 
+private:
+    QMutex mutex;
 };
 
 class ReadWriteLogger : public WaitingLogger
@@ -71,6 +75,8 @@ protected:
 
     QStringList resourceAccesses;
 
+private:
+    QMutex mutex;
 };
 
 #endif // WAITINGLOGGER_H
