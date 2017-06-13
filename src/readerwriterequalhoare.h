@@ -1,8 +1,9 @@
 #ifndef READERWRITEREQUALHOARE_H
 #define READERWRITEREQUALHOARE_H
 
+#include "ireaderwriter.h"
 
-class readerwriterequalhoare
+class readerwriterequalhoare : public IReaderWriter
 {
 public:
     readerwriterequalhoare();

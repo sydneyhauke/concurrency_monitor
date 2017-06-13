@@ -21,13 +21,9 @@ SOURCES += src/main.cpp\
     src/readerwriterequalsem.cpp \
     src/readerwriterpriowritermut.cpp \
     src/readerwriterequalmut.cpp \
-    src/readerwriterprioreadercond.cpp \
-    src/readerwriterpriowritercond.cpp \
-    src/readerwriterequalcond.cpp \
     src/readerwriterprioreaderhoare.cpp \
     src/readerwriterpriowriterhoare.cpp \
-    src/readerwriterequalhoare.cpp \
-    src/readerwriterprioreadermut.cpp
+    src/readerwriterequalhoare.cpp
 
 HEADERS  +=  \
     src/waitinglogger.h \
@@ -48,4 +44,5 @@ HEADERS  +=  \
     src/readerwriterprioreaderhoare.h \
     src/readerwriterpriowriterhoare.h \
     src/readerwriterequalhoare.h \
-    src/readerwriterprioreadermut.h
+    src/readerwriterprioreadermut.h \
+    src/readerwriterequalcond.h

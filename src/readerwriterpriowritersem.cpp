@@ -1,6 +1,6 @@
 #include "readerwriterpriowritersem.h"
 
-readerwriterpriowritersem::readerwriterpriowritersem() :
+readerwriterpriowriterSem::readerwriterpriowriterSem() :
     mutexReaders(1),
     mutexWriters(1),
     writer(1),
@@ -10,7 +10,7 @@ readerwriterpriowritersem::readerwriterpriowritersem() :
     nbWriters(0)
 {}
 
-virtual void readerwriterpriowriterSem::lockReader() {
+void readerwriterpriowriterSem::lockReader() {
     mutexReaders.acquire();
     reader.acquire();
     mutex.acquire();
@@ -23,7 +23,7 @@ virtual void readerwriterpriowriterSem::lockReader() {
     mutexReaders.release();
 }
 
-virtual void readerwriterpriowriterSem::unlockReader() {
+void readerwriterpriowriterSem::unlockReader() {
     mutex.acquire();
     nbReaders--;
     if (nbReaders == 0) {
@@ -32,7 +32,7 @@ virtual void readerwriterpriowriterSem::unlockReader() {
     mutex.release();
 }
 
-virtual void readerwriterpriowriterSem::lockWriter() {
+void readerwriterpriowriterSem::lockWriter() {
     mutexWriters.acquire();
     nbWriters++;
     if (nbWriters == 1) {
@@ -42,7 +42,7 @@ virtual void readerwriterpriowriterSem::lockWriter() {
     writer.acquire();
 }
 
-virtual void readerwriterpriowriterSem::unlockWriter() {
+void readerwriterpriowriterSem::unlockWriter() {
     writer.release();
     mutexWriters.acquire();
     nbWriters--;

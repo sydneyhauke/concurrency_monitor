@@ -10,7 +10,7 @@ readerwriterpriowritermut::readerwriterpriowritermut() :
     nbWriters(0)
 {}
 
-readerwriterpriowritermut::lockReader() {
+void readerwriterpriowritermut::lockReader() {
     mutexReaders.lock();
     reader.lock();
     mutex.lock();
@@ -23,7 +23,7 @@ readerwriterpriowritermut::lockReader() {
     mutexReaders.unlock();
 }
 
-readerwriterpriowritermut::unlockReader() {
+void readerwriterpriowritermut::unlockReader() {
     mutex.lock();
     nbReaders--;
     if (nbReaders == 0) {
@@ -32,7 +32,7 @@ readerwriterpriowritermut::unlockReader() {
     mutex.unlock();
 }
 
-readerwriterpriowritermut::lockWriter() {
+void readerwriterpriowritermut::lockWriter() {
     mutexWriters.lock();
     nbWriters++;
     if(nbWriters == 1) {
@@ -42,7 +42,7 @@ readerwriterpriowritermut::lockWriter() {
     writer.lock();
 }
 
-readerwriterpriowritermut::unlockWriter() {
+void readerwriterpriowritermut::unlockWriter() {
     writer.unlock();
     mutexWriters.lock();
     nbWriters--;

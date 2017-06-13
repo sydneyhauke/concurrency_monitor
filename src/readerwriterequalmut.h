@@ -4,7 +4,7 @@
 #include "ireaderwriter.h"
 #include "omutex.h"
 
-class readerwriterequalmut
+class readerwriterequalmut : public IReaderWriter
 {
 protected:
     OMutex mutex;
@@ -14,10 +14,10 @@ protected:
 
 public:
     readerwriterequalmut();
-    virtual void lockReader();
-    virtual void unlockReader();
-    virtual void lockWriter();
-    virtual void unlockWriter();
+    void lockReader();
+    void unlockReader();
+    void lockWriter();
+    void unlockWriter();
 };
 
 #endif // READERWRITEREQUALMUT_H

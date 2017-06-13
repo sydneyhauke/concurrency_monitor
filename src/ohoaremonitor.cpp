@@ -26,7 +26,7 @@ void OHoareMonitor::wait(Condition &cond)
         monitorSignale.release();
     else
         monitorMutex.release();
-    cond.waitingSem.acquire();
+    cond.waitingOSem.acquire();
     cond.nbWaiting -= 1;
 }
 
@@ -34,7 +34,7 @@ void OHoareMonitor::signal(Condition &cond)
 {
     if (cond.nbWaiting>0) {
         monitorNbSignale += 1;
-        cond.waitingSem.release();
+        cond.waitingOSem.release();
         monitorSignale.acquire();
         monitorNbSignale -= 1;
     }
