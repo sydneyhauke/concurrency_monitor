@@ -1,6 +1,7 @@
 #include "synchrocontroller.h"
+#include "waitinglogger.h"
 
-SynchroController::SynchroController()
+SynchroController::SynchroController() : barrier(0)
 {
 
 }
@@ -14,10 +15,10 @@ SynchroController *SynchroController::getInstance()
 
 void SynchroController::pause()
 {
-
+    barrier.acquire();
 }
 
 void SynchroController::resume()
 {
-
+    barrier.release();
 }

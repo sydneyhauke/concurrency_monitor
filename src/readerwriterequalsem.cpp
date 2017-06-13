@@ -7,7 +7,7 @@ readerwriterequalsem::readerwriterequalsem() :
     nbReaders(0)
 {}
 
-virtual void readerwriterequalsem::lockReader() {
+void readerwriterequalsem::lockReader() {
     fifo.acquire();
     mutex.acquire();
     nbReaders++;
@@ -18,7 +18,7 @@ virtual void readerwriterequalsem::lockReader() {
     fifo.release();
 }
 
-virtual void readerwriterequalsem::unlockReader() {
+void readerwriterequalsem::unlockReader() {
     mutex.acquire();
     nbReaders--;
     if (nbReaders == 0) {
@@ -27,12 +27,12 @@ virtual void readerwriterequalsem::unlockReader() {
     mutex.release();
 }
 
-virtual void readerwriterequalsem::lockWriter() {
+void readerwriterequalsem::lockWriter() {
     fifo.acquire();
     writer.acquire();
 }
 
-virtual void readerwriterequalsem::unlockWriter() {
+void readerwriterequalsem::unlockWriter() {
     writer.release();
     fifo.release();
 }
