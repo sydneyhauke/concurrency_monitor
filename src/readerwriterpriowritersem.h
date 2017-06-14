@@ -4,7 +4,7 @@
 #include "osemaphore.h"
 #include "ireaderwriter.h"
 
-class readerwriterpriowriterSem
+class readerwriterpriowriterSem : public IReaderWriter
 {
 protected:
     OSemaphore mutexReaders;
@@ -15,7 +15,7 @@ protected:
     int nbReaders, nbWriters;
 
 public:
-    readerwriterpriorwriterSem();
+    readerwriterpriowriterSem();
     virtual void lockReader();
     virtual void unlockReader();
     virtual void lockWriter();

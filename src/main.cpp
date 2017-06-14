@@ -1,16 +1,83 @@
 
 #include <QApplication>
+#include <QThread>
 
 #include "synchrocontroller.h"
+#include "readerwriterprioreadermut.h"
+#include "ireaderwriter.h"
+
+#define NB_READERS 5
+#define NB_WRITERS 3
+
+readerwriterprioreadermut resource();
+
+class Writer : public QThread {
+private :
+    IReaderWriter *_resource;
+
+public:
+    Writer(IReaderWriter *resource) : _resource(resource) {}
+
+    void run() Q_DECL_OVERRIDE {
+        while(1) {
+            _resource->lockWriter();
+            usleep((int)((float)600000*rand()/(RAND_MAX+1.0)));
+
+            _resource->unlockWriter();
+            usleep((int)((float)600000*rand()/(RAND_MAX+1.0)));
+        }
+    }
+};
+
+class Reader : public QThread {
+private:
+    IReaderWriter *_resource;
+
+public:
+    Reader(IReaderWriter *resource) : _resource(resource){}
+
+    void run() Q_DECL_OVERRIDE {
+        while(1) {
+            _resource->lockReader();
+            usleep((int)((float)600000*rand()/(RAND_MAX+1.0)));
+
+            _resource->unlockReader();
+            usleep((int)((float)600000*rand()/(RAND_MAX+1.0)));
+        }
+    }
+};
 
 int main(int argc, char *argv[])
 {
+    Reader* readerThreads[NB_READERS];
+    Writer* writerThreads[NB_WRITERS];
 
     // Create the resource manager object
+    IReaderWriter *resource = new readerwriterprioreadermut();
 
     // Create the threads
+    for(size_t i = 0; i < NB_READERS; i++) {
+        readerThreads[i] = new Reader(resource);
+
+        QString threadName = QString("Reader%1").arg(i);
+        readerThreads[i]->setObjectName(threadName);
+    }
+
+    for(size_t i = 0; i < NB_WRITERS; i++) {
+        writerThreads[i] = new Writer(resource);
+
+        QString threadName = QString("Writer%1").arg(i);
+        writerThreads[i]->setObjectName(threadName);
+    }
 
     // Start the threads
+    for(size_t i = 0; i < NB_READERS; i++) {
+        readerThreads[i]->start();
+    }
+
+    for(size_t i = 0; i < NB_WRITERS; i++) {
+        writerThreads[i]->start();
+    }
 
     bool continuing = true;
 
@@ -25,6 +92,16 @@ int main(int argc, char *argv[])
     }
 
     // Kill the threads
+    // Like, really ? killing ?...
+    for(size_t i = 0; i < NB_WRITERS; i++) {
+        writerThreads[i]->terminate();
+    }
+
+    for(size_t i = 0; i < NB_WRITERS; i++) {
+        delete writerThreads[i];
+    }
+
+    delete resource;
 
     return 0;
 

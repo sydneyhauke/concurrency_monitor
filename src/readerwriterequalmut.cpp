@@ -7,7 +7,7 @@ readerwriterequalmut::readerwriterequalmut() :
     nbReaders(0)
 {}
 
-readerwriterequalmut::lockReader() {
+void readerwriterequalmut::lockReader() {
     fifo.lock();
     mutex.lock();
     nbReaders++;
@@ -18,7 +18,7 @@ readerwriterequalmut::lockReader() {
     fifo.unlock();
 }
 
-readerwriterequalmut::unlockReader() {
+void readerwriterequalmut::unlockReader() {
     mutex.lock();
     nbReaders--;
     if(nbReaders == 0) {
@@ -27,12 +27,12 @@ readerwriterequalmut::unlockReader() {
     mutex.unlock();
 }
 
-readerwriterequalmut::lockWriter() {
+void readerwriterequalmut::lockWriter() {
     fifo.lock();
     writer.lock();
 }
 
-readerwriterequalmut::unlockWriter() {
+void readerwriterequalmut::unlockWriter() {
     writer.unlock();
     fifo.unlock();
 }
