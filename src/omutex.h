@@ -21,7 +21,7 @@ public:
 
     bool getState();
 
-    QMutex* getMutex();
+    OMutex* getMutex();
 };
 
 #endif // PMUTEX_H

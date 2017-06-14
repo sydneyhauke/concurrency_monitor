@@ -13,11 +13,45 @@ protected:
     int nbReaders;
 
 public:
-    readerwriterequalmut();
-    void lockReader();
-    void unlockReader();
-    void lockWriter();
-    void unlockWriter();
+
+    readerwriterequalmut() :
+        mutex(),
+        fifo(),
+        writer(),
+        nbReaders(0)
+    {}
+
+    virtual void lockReader() {
+        fifo.lock();
+        mutex.lock();
+        nbReaders++;
+        if(nbReaders++) {
+            writer.lock();
+        }
+        mutex.unlock();
+        fifo.unlock();
+    }
+
+    virtual void unlockReader() {
+        mutex.lock();
+        nbReaders--;
+        if(nbReaders == 0) {
+            writer.unlock();
+        }
+        mutex.unlock();
+    }
+
+    virtual void lockWriter() {
+        fifo.lock();
+        writer.lock();
+    }
+
+    virtual void unlockWriter() {
+        writer.unlock();
+        fifo.unlock();
+    }
+
+
 };
 
 #endif // READERWRITEREQUALMUT_H

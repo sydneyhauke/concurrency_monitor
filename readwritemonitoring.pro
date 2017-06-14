@@ -15,15 +15,7 @@ SOURCES += src/main.cpp\
     src/omutex.cpp \
     src/osemaphore.cpp \
     src/owaitcondition.cpp \
-    src/ohoaremonitor.cpp \
-    src/readerwriterprioreadersem.cpp \
-    src/readerwriterpriowritersem.cpp \
-    src/readerwriterequalsem.cpp \
-    src/readerwriterpriowritermut.cpp \
-    src/readerwriterequalmut.cpp \
-    src/readerwriterprioreaderhoare.cpp \
-    src/readerwriterpriowriterhoare.cpp \
-    src/readerwriterequalhoare.cpp
+    src/ohoaremonitor.cpp
 
 HEADERS  +=  \
     src/waitinglogger.h \

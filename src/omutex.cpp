@@ -36,7 +36,7 @@ bool OMutex::getState()
     return locked;
 }
 
-QMutex* OMutex::getMutex()
+OMutex* OMutex::getMutex()
 {
     return &mutex;
 }

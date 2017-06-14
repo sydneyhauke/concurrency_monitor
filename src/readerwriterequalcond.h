@@ -2,29 +2,54 @@
 #define READERWRITEREQUALCOND_H
 
 #include "ireaderwriter.h"
+#include "osemaphore.h"
+#include "owaitcondition.h"
+#include "omutex.h"
 
 class readerwriterequalcond : public IReaderWriter
 {
+protected:
+    OSemaphore fifo;
+    OMutex mutex;
+    OWaitCondition writer;
+    int readers;
+
 public:
-    readerwriterequalcond::readerwriterequalcond()
-    {
 
+    readerwriterequalcond() :
+        fifo(1),
+        mutex(1),
+        readers(0)
+    {}
+
+    virtual void lockReader() {
+        fifo.acquire();
+        mutex.acquire();
+        readers++;
+        if (readers == 1) {
+            writer.wait(&mutex);
+        }
+        mutex.unlock();
+        fifo.release();
     }
 
-    void readerwriterequalcond::lockReader() {
-
+    virtual void unlockReader() {
+        mutex.lock();
+        readers--;
+        if (readers == 0) {
+            writer.wakeOne();
+        }
+        mutex.unlock();
     }
 
-    void readerwriterequalcond::lockWriter() {
-
+    virtual void lockWriter() {
+        fifo.acquire();
+        writer.wait();
     }
 
-    void readerwriterequalcond::unlockReader() {
-
-    }
-
-    void readerwriterequalcond::unlockWriter() {
-
+    virtual void unlockWriter() {
+        writer.wakeOne();
+        fifo.release();
     }
 
 };
