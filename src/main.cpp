@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
     while (continuing) {
         // Wait for a key press
         std::cout << "Push on Enter to continue ..." << std::endl;
-        std::cin >> input;
+        input = std::cin.get();
         std::cout << "value of input : " << input << std::endl;
         // If key was <Enter>
         if (input == 0) {
