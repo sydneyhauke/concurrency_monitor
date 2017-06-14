@@ -4,7 +4,7 @@
 #include "ireaderwriter.h"
 #include "osemaphore.h"
 
-class readerwriterequalsem
+class readerwriterequalsem : public IReaderWriter
 {
 protected:
     OSemaphore mutex;
@@ -13,11 +13,42 @@ protected:
     int nbReaders;
 
 public:
-    readerwriterequalsem();
-    virtual void lockReader();
-    virtual void unlockReader();
-    virtual void lockWriter();
-    virtual void unlockWriter();
+    readerwriterequalsem() :
+        mutex(1),
+        fifo(1),
+        writer(1),
+        nbReaders(0)
+    {}
+
+    virtual void lockReader() {
+        fifo.acquire();
+        mutex.acquire();
+        nbReaders++;
+        if (nbReaders == 1) {
+            writer.acquire();
+        }
+        mutex.release();
+        fifo.release();
+    }
+
+    virtual void unlockReader() {
+        mutex.acquire();
+        nbReaders--;
+        if (nbReaders == 0) {
+            writer.release();
+        }
+        mutex.release();
+    }
+
+    virtual void lockWriter() {
+        fifo.acquire();
+        writer.acquire();
+    }
+
+    virtual void unlockWriter() {
+        writer.release();
+        fifo.release();
+    }
 };
 
 #endif // READERWRITEREQUALSEM_H
