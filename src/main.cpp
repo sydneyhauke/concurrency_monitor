@@ -1,6 +1,7 @@
 
 #include <QApplication>
 #include <QThread>
+#include <iostream>
 
 #include "synchrocontroller.h"
 #include "readerwriterprioreadermut.h"
@@ -49,6 +50,8 @@ public:
 
 int main(int argc, char *argv[])
 {
+    int input = 0;
+
     Reader* readerThreads[NB_READERS];
     Writer* writerThreads[NB_WRITERS];
 
@@ -83,12 +86,18 @@ int main(int argc, char *argv[])
 
     while (continuing) {
         // Wait for a key press
-
-        // If key is <enter>
-        SynchroController::getInstance()->resume();
-
+        std::cout << "Push on Enter to continue ..." << std::endl;
+        std::cin >> input;
+        std::cout << "value of input : " << input << std::endl;
+        // If key was <Enter>
+        if (input == 0) {
+            std::cout << "Hello I'm in the while loop" << std::endl;
+            //SynchroController::getInstance()->resume();
+        }
         // If key was <esc>
-        continuing = false;
+        else if (input == 27) {
+            continuing = false;
+        }
     }
 
     // Kill the threads
@@ -102,6 +111,8 @@ int main(int argc, char *argv[])
     }
 
     delete resource;
+
+    std::cout << "Hello I'm finishing the program" << std::endl;
 
     return 0;
 

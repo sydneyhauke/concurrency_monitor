@@ -4,7 +4,7 @@
 #include "omutex.h"
 #include "ireaderwriter.h"
 
-class readerwriterpriowritermut
+class readerwriterpriowritermut : public IReaderWriter
 {
 protected:
     OMutex mutexReaders;

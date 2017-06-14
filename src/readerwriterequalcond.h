@@ -44,7 +44,7 @@ public:
 
     virtual void lockWriter() {
         fifo.acquire();
-        writer.wait();
+        writer.wait(&mutex);
     }
 
     virtual void unlockWriter() {
