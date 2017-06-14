@@ -4,7 +4,7 @@
 #include "omutex.h"
 #include "ireaderwriter.h"
 
-class readerwriterprioreadermut
+class readerwriterprioreadermut : public IReaderWriter
 {
 protected:
     OMutex mutexReaders;
@@ -13,11 +13,40 @@ protected:
     int nbReaders;
 
 public:
-    readerwriterprioreadermut();
-    virtual void lockReader();
-    virtual void unlockReader();
-    virtual void lockWriter();
-    virtual void unlockWriter();
+    readerwriterprioreadermut() :
+        mutexReaders(),
+        mutexWriters(),
+        writer(),
+        nbReaders(0)
+    {}
+
+    virtual void lockReader() {
+        mutexReaders.lock();
+        nbReaders++;
+        if(nbReaders == 1) {
+            writer.lock();
+        }
+        mutexReaders.unlock();
+    }
+
+    virtual void unlockReader() {
+        mutexReaders.lock();
+        nbReaders--;
+        if(nbReaders == 0) {
+            writer.unlock();
+        }
+        mutexReaders.unlock();
+    }
+
+    virtual void lockWriter() {
+        mutexWriters.lock();
+        writer.lock();
+    }
+
+    virtual void unlockWriter() {
+        writer.unlock();
+        mutexWriters.unlock();
+    }
 };
 
 #endif // READERWRITERPRIOREADERMUT_H
