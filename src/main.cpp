@@ -1,6 +1,6 @@
 
 #include <QApplication>
-
+#include <QKeyEvent>
 #include "synchrocontroller.h"
 
 int main(int argc, char *argv[])
@@ -16,12 +16,16 @@ int main(int argc, char *argv[])
 
     while (continuing) {
         // Wait for a key press
+        QKeyEvent *event;
 
         // If key is <enter>
-        SynchroController::getInstance()->resume();
+        if(event->key() == Qt::Key_Enter){
+            SynchroController::getInstance()->resume();
+        }
 
-        // If key was <esc>
-        continuing = false;
+        if(event->key() == Qt::Key_Escape){
+            continuing = false;
+        }
     }
 
     // Kill the threads
