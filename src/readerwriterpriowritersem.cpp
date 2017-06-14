@@ -1,4 +1,5 @@
 #include "readerwriterpriowritersem.h"
+#include "synchrocontroller.h"
 
 readerwriterpriowritersem::readerwriterpriowritersem() :
     mutexReaders(1),
@@ -16,6 +17,7 @@ virtual void readerwriterpriowriterSem::lockReader() {
     mutex.acquire();
     nbReaders++;
     if (nbReaders == 1) {
+        SynchroController.getInstance()->pause();
         writer.acquire();
     }
     mutex.release();
