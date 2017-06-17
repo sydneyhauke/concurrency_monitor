@@ -59,8 +59,7 @@ public:
 
 int main(int argc, char *argv[])
 {
-    std::string input;
-    int intInput;
+    int input;
 
     Reader* readerThreads[NB_READERS];
     Writer* writerThreads[NB_WRITERS];
@@ -94,24 +93,26 @@ int main(int argc, char *argv[])
 
     bool continuing = true;
 
-    // The keycodes we get for <Enter> and <esc> are not the ones expected. In fact,
-    // <Enter> should be 13 and <esc> should be 27
     while (continuing) {
         // Wait for a key press
         std::cout << "Push on <Enter> to continue or <esc> to stop ..." << std::endl;
 
         input = std::cin.get();
-        std::istringstream buffer(input);
-        buffer >> intInput;
+
+        int c = input;
+        while(c != '\n') {
+            c = std::cin.get();
+        }
 
         // If key was <Enter>
-        if (intInput == 32) {
+        if (input == '\n') {
             SynchroController::getInstance()->resume();
         }
         // If key was <esc>
-        else if (intInput == 0) {
+        else if (input == 27) {
             continuing = false;
         }
+
     }
 
     // Kill the threads

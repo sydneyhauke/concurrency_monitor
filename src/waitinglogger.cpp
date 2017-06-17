@@ -2,10 +2,7 @@
 #include "synchrocontroller.h"
 #include <iostream>
 
-WaitingLogger::WaitingLogger()
-{
-
-}
+WaitingLogger::WaitingLogger() {}
 
 
 
@@ -21,8 +18,6 @@ QList<WaitingQueue *> WaitingLogger::getQueues() const
 {
     return waitingQueues;
 }
-
-
 
 /**
  * @brief WaitingLogger::addWaiting Adds a thread to a waiting queue. If the waiting doesn't already
@@ -95,23 +90,15 @@ void WaitingLogger::updateView()
         }
         std::cout << std::endl;
     }
+    std::cout << std::endl;
 }
-
-
 
 QStringList ReadWriteLogger::getResourceAccesses() const
 {
     return resourceAccesses;
 }
 
-
-
-ReadWriteLogger::ReadWriteLogger()
-{
-
-}
-
-
+ReadWriteLogger::ReadWriteLogger() {}
 
 void ReadWriteLogger::addResourceAccess(const QString &threadName)
 {
@@ -124,14 +111,13 @@ void ReadWriteLogger::addResourceAccess(const QString &threadName)
 
     resourceAccesses.push_back(threadName);
 
+    std::cout << "== Logger state ==" << std::endl;
     WaitingLogger::updateView();
     updateView();
     SynchroController::getInstance()->pause();
 
     mutex.unlock();
 }
-
-
 
 void ReadWriteLogger::removeResourceAccess(const QString &threadName)
 {
@@ -140,14 +126,11 @@ void ReadWriteLogger::removeResourceAccess(const QString &threadName)
     mutex.unlock();
 }
 
-
-
-
 void ReadWriteLogger::updateView()
 {
     std::cout << "In resource : ";
     for(QStringList::iterator it = resourceAccesses.begin(); it != resourceAccesses.end(); it++, std::cout << (it == resourceAccesses.end() ? "":", ")) {
         std::cout << it->toStdString();
     }
-    std::cout << std::endl;
+    std::cout << std::endl << std::endl;
 }
