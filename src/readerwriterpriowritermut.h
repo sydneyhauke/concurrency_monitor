@@ -16,55 +16,33 @@ protected:
 
 public:
     readerwriterpriowritermut() :
-        mutexReaders(),
-        mutexWriters(),
-        writer(),
-        reader(),
-        mutex(),
+        mutexReaders(1),
+        mutexWriters(1),
+        writer(1),
+        reader(1),
+        mutex(1),
         nbReaders(0),
         nbWriters(0)
     {}
 
     virtual void lockReader() {
         mutexReaders.lock();
-        reader.lock();
-        mutex.lock();
-        nbReaders++;
-        if(nbReaders == 1) {
-            writer.lock();
-        }
-        mutex.unlock();
-        reader.unlock();
+
         mutexReaders.unlock();
     }
 
     virtual void unlockReader() {
-        mutex.lock();
-        nbReaders--;
-        if (nbReaders == 0) {
-            writer.unlock();
-        }
-        mutex.unlock();
+        mutexReaders.lock();
+
+        mutexReaders.unlock();
     }
 
     virtual void lockWriter() {
-        mutexWriters.lock();
-        nbWriters++;
-        if(nbWriters == 1) {
-            reader.lock();
-        }
-        mutexWriters.unlock();
-        writer.lock();
+
     }
 
     virtual void unlockWriter() {
-        writer.unlock();
-        mutexWriters.lock();
-        nbWriters--;
-        if(nbWriters == 0) {
-            reader.unlock();
-        }
-        mutexWriters.unlock();
+
     }
 };
 

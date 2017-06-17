@@ -11,15 +11,17 @@ class readerwriterequalcond : public IReaderWriter
 protected:
     OSemaphore fifo;
     OSemaphore mutex;
-    OWaitCondition writer;
+    OWaitCondition accessor;
     int nbReaders;
+    bool first;
 
 public:
 
     readerwriterequalcond() :
-        writer(1),
+        accessor(1),
         fifo(1),
         mutex(1),
+        firstReader(true),
         nbReaders(0)
     {}
 
@@ -27,31 +29,36 @@ public:
         fifo.acquire();
         mutex.acquire();
         nbReaders++;
-        if (readers == 1) {
-            writer.wait(&mutex);
+        if (nbReaders == 1 || !firstReader) {
+            accessor.wait(&mutex);
         }
+        firstReader = false;
         mutex.release();
         fifo.release();
-        SynchroController::getInstance()->pause();
     }
 
     virtual void unlockReader() {
         mutex.acquire();
         nbReaders--;
         if (nbReaders == 0) {
-            writer.wakeOne();
+            accessor.wakeOne();
         }
         mutex.release();
     }
 
     virtual void lockWriter() {
         fifo.acquire();
-        writer.wait(&mutex);
+
+        if (!firstWriter) {
+            accessor.wait(&mutex);
+        }
+
+        firstWriter = false;
     }
 
     virtual void unlockWriter() {
-        writer.wakeOne();
         fifo.release();
+        accessor.wakeOne();
     }
 
 };
