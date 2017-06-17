@@ -15,9 +15,9 @@ protected:
 public:
 
     readerwriterequalmut() :
-        mutex(),
-        fifo(),
-        writer(),
+        mutex(1),
+        fifo(1),
+        writer(1),
         nbReaders(0)
     {}
 
@@ -25,7 +25,7 @@ public:
         fifo.lock();
         mutex.lock();
         nbReaders++;
-        if(nbReaders++) {
+        if (nbReaders == 1) {
             writer.lock();
         }
         mutex.unlock();
@@ -35,7 +35,7 @@ public:
     virtual void unlockReader() {
         mutex.lock();
         nbReaders--;
-        if(nbReaders == 0) {
+        if (nbReaders == 0) {
             writer.unlock();
         }
         mutex.unlock();
