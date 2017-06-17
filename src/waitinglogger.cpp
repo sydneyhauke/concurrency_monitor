@@ -6,16 +6,22 @@ WaitingLogger::WaitingLogger()
 
 }
 
+
+
 WaitingLogger *WaitingLogger::getInstance()
 {
     static WaitingLogger *instance = new ReadWriteLogger();
     return instance;
 }
 
+
+
 QList<WaitingQueue *> WaitingLogger::getQueues() const
 {
     return waitingQueues;
 }
+
+
 
 /**
  * @brief WaitingLogger::addWaiting Adds a thread to a waiting queue. If the waiting doesn't already
@@ -46,6 +52,8 @@ void WaitingLogger::addWaiting(const QString& threadName, const QString& objectN
     mutex.unlock();
 }
 
+
+
 /**
  * @brief WaitingLogger::removeWaiting Removes a thread from a waiting queue. If a waiting queue
  * is empty, it is not removed.
@@ -72,6 +80,8 @@ void WaitingLogger::removeWaiting(const QString& threadName, const QString& obje
     }
 }
 
+
+
 void WaitingLogger::updateView()
 {
     for(QList<WaitingQueue *>::iterator itQueue = waitingQueues.begin(); itQueue != waitingQueues.end();itQueue++) {
@@ -83,15 +93,21 @@ void WaitingLogger::updateView()
     }
 }
 
+
+
 QStringList ReadWriteLogger::getResourceAccesses() const
 {
     return resourceAccesses;
 }
 
+
+
 ReadWriteLogger::ReadWriteLogger()
 {
 
 }
+
+
 
 void ReadWriteLogger::addResourceAccess(const QString &threadName)
 {
@@ -100,12 +116,16 @@ void ReadWriteLogger::addResourceAccess(const QString &threadName)
     mutex.unlock();
 }
 
+
+
 void ReadWriteLogger::removeResourceAccess(const QString &threadName)
 {
     mutex.lock();
     resourceAccesses.removeAll(threadName);
     mutex.unlock();
 }
+
+
 
 
 void ReadWriteLogger::updateView()

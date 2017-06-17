@@ -20,16 +20,17 @@ public:
         nbReaders(0)
     {}
 
-    void lockReader() {
+    virtual void lockReader() {
         mutexReaders.lock();
         nbReaders++;
         if(nbReaders == 1) {
             writer.lock();
         }
         mutexReaders.unlock();
+        SynchroController::getInstance()->pause();
     }
 
-    void unlockReader() {
+    virtual void unlockReader() {
         mutexReaders.lock();
         nbReaders--;
         if(nbReaders == 0) {
@@ -38,12 +39,12 @@ public:
         mutexReaders.unlock();
     }
 
-    void lockWriter() {
+    virtual void lockWriter() {
         mutexWriters.lock();
         writer.lock();
     }
 
-    void unlockWriter() {
+    virtual void unlockWriter() {
         writer.unlock();
         mutexWriters.unlock();
     }

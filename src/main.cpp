@@ -1,6 +1,9 @@
 
 #include <QApplication>
 #include <QThread>
+#include <iostream>
+#include <string>
+#include <sstream>
 
 #include "synchrocontroller.h"
 #include "readerwriterprioreadermut.h"
@@ -49,6 +52,9 @@ public:
 
 int main(int argc, char *argv[])
 {
+    std::string input;
+    int intInput;
+
     Reader* readerThreads[NB_READERS];
     Writer* writerThreads[NB_WRITERS];
 
@@ -81,15 +87,24 @@ int main(int argc, char *argv[])
 
     bool continuing = true;
 
+    // The keycodes we get for <Enter> and <esc> are not the ones expected. In fact,
+    // <Enter> should be 13 and <esc> should be 27
     while (continuing) {
         // Wait for a key press
+        std::cout << "Push on <Enter> to continue or <esc> to stop ..." << std::endl;
 
+        input = std::cin.get();
+        std::istringstream buffer(input);
+        buffer >> intInput;
 
-        // If key is <enter>
-        SynchroController::getInstance()->resume();
-
+        // If key was <Enter>
+        if (intInput == 32) {
+            SynchroController::getInstance()->resume();
+        }
         // If key was <esc>
-        continuing = false;
+        else if (intInput == 0) {
+            continuing = false;
+        }
     }
 
     // Kill the threads
@@ -98,11 +113,20 @@ int main(int argc, char *argv[])
         writerThreads[i]->terminate();
     }
 
+    for(size_t i = 0; i < NB_READERS; i++) {
+        readerThreads[i]->terminate();
+    }
+
+
     for(size_t i = 0; i < NB_WRITERS; i++) {
         delete writerThreads[i];
     }
 
-    delete resource;
+    for(size_t i = 0; i < NB_READERS; i++) {
+        delete readerThreads[i];
+    }
+
+    std::cout << "Program finised" << std::endl;
 
     return 0;
 

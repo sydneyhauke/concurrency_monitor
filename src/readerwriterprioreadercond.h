@@ -5,25 +5,62 @@
 
 class readerwriterprioreadercond : public IReaderWriter
 {
+protected:
+    OWaitCondition reader;
+    OWaitCondition writer;
+    OMutex mutex;
+    int writers, readers;
+    bool writerAccessing;
+
 public:
-    readerwriterprioreadercond::readerwriterprioreadercond() {
 
+    readerwriterprioreadercond() :
+        mutex(1),
+        writers(0),
+        readers(0),
+        writerAccessing(false)
+    {}
+
+    virtual void lockReader() {
+        mutex.lock();
+        readers++;
+        if (writerAccessing) {
+            reader.wait(&mutex);
+        }
+        mutex.unlock();
     }
 
-    void readerwriterprioreadercond::lockReader() {
-
+    virtual void unlockReader() {
+        mutex.lock();
+        readers--;
+        if (readers == 0) {
+            writer.wakeOne();
+        }
+        mutex.unlock();
     }
 
-    void readerwriterprioreadercond::lockWriter() {
-
+    virtual void lockWriter() {
+        mutex.lock();
+        writers++;
+        while (readers > 0 || writerAccessing) {
+            writer.wait(&mutex);
+        }
+        writerAccessing = true;
+        mutex.unlock();
     }
 
-    void readerwriterprioreadercond::unlockReader() {
+    virtual void unlockWriter() {
+        mutex.lock();
+        writers--;
+        writerAccessing = false;
+        if (readers > 0) {
+            reader.wakeAll();
+        }
 
-    }
-
-    void readerwriterprioreadercond::unlockWriter() {
-
+        if (readers == 0 && writers > 0) {
+            writer.wakeOne();
+        }
+        mutex.unlock();
     }
 };
 
