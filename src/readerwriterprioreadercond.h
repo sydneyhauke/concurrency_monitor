@@ -9,21 +9,21 @@ protected:
     OWaitCondition reader;
     OWaitCondition writer;
     OMutex mutex;
-    int writers, readers;
+    int nbWriters, nbReaders;
     bool writerAccessing;
 
 public:
 
     readerwriterprioreadercond() :
         mutex(1),
-        writers(0),
-        readers(0),
+        nbWriters(0),
+        nbReaders(0),
         writerAccessing(false)
     {}
 
     virtual void lockReader() {
         mutex.lock();
-        readers++;
+        nbReaders++;
         if (writerAccessing) {
             reader.wait(&mutex);
         }
@@ -32,8 +32,8 @@ public:
 
     virtual void unlockReader() {
         mutex.lock();
-        readers--;
-        if (readers == 0) {
+        nbReaders--;
+        if (nbReaders == 0) {
             writer.wakeOne();
         }
         mutex.unlock();
@@ -41,8 +41,8 @@ public:
 
     virtual void lockWriter() {
         mutex.lock();
-        writers++;
-        while (readers > 0 || writerAccessing) {
+        nbWriters++;
+        while (nbReaders > 0 || writerAccessing) {
             writer.wait(&mutex);
         }
         writerAccessing = true;
@@ -51,13 +51,13 @@ public:
 
     virtual void unlockWriter() {
         mutex.lock();
-        writers--;
+        nbWriters--;
         writerAccessing = false;
-        if (readers > 0) {
+        if (nbReaders > 0) {
             reader.wakeAll();
         }
 
-        if (readers == 0 && writers > 0) {
+        if (nbReaders == 0 && nbWriters > 0) {
             writer.wakeOne();
         }
         mutex.unlock();

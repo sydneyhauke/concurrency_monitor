@@ -28,6 +28,8 @@ public:
     virtual void lockReader() {
         mutexReaders.lock();
 
+        if (nbWriters > 0 || )
+
         mutexReaders.unlock();
     }
 
