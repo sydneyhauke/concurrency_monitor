@@ -18,12 +18,11 @@
 #include "ohoaremonitor.h"
 
 
-class readerwriterequalhoare : public IReaderWriter
+class readerwriterequalhoare : public IReaderWriter, public OHoareMonitor
 {
 protected:
     OSemaphore fifo;
-    OHoareMonitor writer;
-    OHoareMonitor::Condition accessing;
+    Condition accessing;
     int nbReaders;
 
 public:
@@ -47,9 +46,9 @@ public:
         monitorIn();
         nbReaders--;
         if (nbReaders == 0) {
-            OHoareMonitor::signal(accessing);
+            signal(accessing);
         }
-        fifo.release();
+        //fifo.release();
         monitorOut();
     }
 
@@ -62,7 +61,7 @@ public:
 
     virtual void unlockWriter() {
         monitorIn();
-        OHoareMonitor::signal(accessing);
+        signal(accessing);
         fifo.release();
         monitorOut();
     }
