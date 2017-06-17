@@ -10,36 +10,37 @@ class readerwriterequalcond : public IReaderWriter
 {
 protected:
     OSemaphore fifo;
-    OMutex mutex;
+    OSemaphore mutex;
     OWaitCondition writer;
-    int readers;
+    int nbReaders;
 
 public:
 
     readerwriterequalcond() :
+        writer(1),
         fifo(1),
         mutex(1),
-        readers(0)
+        nbReaders(0)
     {}
 
     virtual void lockReader() {
         fifo.acquire();
         mutex.acquire();
-        readers++;
+        nbReaders++;
         if (readers == 1) {
             writer.wait(&mutex);
         }
-        mutex.unlock();
+        mutex.release();
         fifo.release();
     }
 
     virtual void unlockReader() {
-        mutex.lock();
-        readers--;
-        if (readers == 0) {
+        mutex.acquire();
+        nbReaders--;
+        if (nbReaders == 0) {
             writer.wakeOne();
         }
-        mutex.unlock();
+        mutex.release();
     }
 
     virtual void lockWriter() {
