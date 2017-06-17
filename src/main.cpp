@@ -6,13 +6,12 @@
 #include <sstream>
 
 #include "synchrocontroller.h"
-#include "readerwriterprioreadermut.h"
+#include "readerwriterprioreadersem.h"
 #include "ireaderwriter.h"
+#include "waitinglogger.h"
 
-#define NB_READERS 5
+#define NB_READERS 2
 #define NB_WRITERS 3
-
-readerwriterprioreadermut resource();
 
 class Writer : public QThread {
 private :
@@ -24,9 +23,13 @@ public:
     void run() Q_DECL_OVERRIDE {
         while(1) {
             _resource->lockWriter();
+            ((ReadWriteLogger*)ReadWriteLogger::getInstance())->addResourceAccess(this->objectName());
+
             usleep((int)((float)600000*rand()/(RAND_MAX+1.0)));
 
             _resource->unlockWriter();
+            ((ReadWriteLogger*)ReadWriteLogger::getInstance())->removeResourceAccess(this->objectName());
+
             usleep((int)((float)600000*rand()/(RAND_MAX+1.0)));
         }
     }
@@ -42,9 +45,13 @@ public:
     void run() Q_DECL_OVERRIDE {
         while(1) {
             _resource->lockReader();
+            ((ReadWriteLogger*)ReadWriteLogger::getInstance())->addResourceAccess(this->objectName());
+
             usleep((int)((float)600000*rand()/(RAND_MAX+1.0)));
 
             _resource->unlockReader();
+            ((ReadWriteLogger*)ReadWriteLogger::getInstance())->removeResourceAccess(this->objectName());
+
             usleep((int)((float)600000*rand()/(RAND_MAX+1.0)));
         }
     }
@@ -59,7 +66,7 @@ int main(int argc, char *argv[])
     Writer* writerThreads[NB_WRITERS];
 
     // Create the resource manager object
-    IReaderWriter *resource = new readerwriterprioreadermut();
+    IReaderWriter *resource = new readerwriterprioreaderSem();
 
     // Create the threads
     for(size_t i = 0; i < NB_READERS; i++) {

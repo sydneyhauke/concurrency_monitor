@@ -2,11 +2,7 @@
 #include "waitinglogger.h"
 #include <iostream>
 
-SynchroController::SynchroController() : barrier(0)
-{
-
-}
-
+SynchroController::SynchroController() {}
 
 SynchroController *SynchroController::getInstance()
 {
@@ -16,12 +12,14 @@ SynchroController *SynchroController::getInstance()
 
 void SynchroController::pause()
 {
-    barrier.acquire();
-    std::cout << "Program paused" << std::endl;
+    monitorIn();
+    wait(waitCond);
+    monitorOut();
 }
 
 void SynchroController::resume()
 {
-    barrier.release();
-    std::cout << "Program resumed" << std::endl;
+    monitorIn();
+    signal(waitCond);
+    monitorOut();
 }

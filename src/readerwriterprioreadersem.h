@@ -1,8 +1,11 @@
 #ifndef READERWRITERPRIOREADERSEM_H
 #define READERWRITERPRIOREADERSEM_H
 
+#include <QThread>
+
 #include "osemaphore.h"
 #include "ireaderwriter.h"
+#include "waitinglogger.h"
 
 class readerwriterprioreaderSem : public IReaderWriter
 {
@@ -22,10 +25,15 @@ public:
     {}
 
     virtual void lockReader() {
+        WaitingLogger::getInstance()->addWaiting(QThread::currentThread()->objectName(), "mutexReaders");
         mutexReaders.acquire();
+        WaitingLogger::getInstance()->removeWaiting(QThread::currentThread()->objectName(), "mutexReaders");
+
         nbReaders++;
         if (nbReaders == 1) {
+            WaitingLogger::getInstance()->addWaiting(QThread::currentThread()->objectName(), "writer");
             writer.acquire();
+            WaitingLogger::getInstance()->removeWaiting(QThread::currentThread()->objectName(), "writer");
         }
         mutexReaders.release();
     }
@@ -40,8 +48,13 @@ public:
     }
 
     virtual void lockWriter() {
+        WaitingLogger::getInstance()->addWaiting(QThread::currentThread()->objectName(), "mutexWriters");
         mutexWriters.acquire();
+        WaitingLogger::getInstance()->removeWaiting(QThread::currentThread()->objectName(), "mutexWriters");
+
+        WaitingLogger::getInstance()->addWaiting(QThread::currentThread()->objectName(), "writer");
         writer.acquire();
+        WaitingLogger::getInstance()->removeWaiting(QThread::currentThread()->objectName(), "writer");
     }
 
     virtual void unlockWriter() {

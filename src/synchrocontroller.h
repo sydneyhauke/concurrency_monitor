@@ -1,12 +1,12 @@
 #ifndef SYNCHROCONTROLLER_H
 #define SYNCHROCONTROLLER_H
 
-#include <QSemaphore>
+#include <ohoaremonitor.h>
 
-class SynchroController
+class SynchroController : public OHoareMonitor
 {
 private:
-    QSemaphore barrier;
+    OHoareMonitor::Condition waitCond;
 
     SynchroController();
 public:
