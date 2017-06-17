@@ -1,6 +1,8 @@
 #ifndef IREADERWRITER_H
 #define IREADERWRITER_H
 
+#include "synchrocontroller.h"
+
 class IReaderWriter {
 public:
     virtual void lockReader() = 0;

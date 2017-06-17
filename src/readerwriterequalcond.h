@@ -32,6 +32,7 @@ public:
         }
         mutex.release();
         fifo.release();
+        SynchroController::getInstance()->pause();
     }
 
     virtual void unlockReader() {

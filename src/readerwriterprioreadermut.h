@@ -27,6 +27,7 @@ public:
             writer.lock();
         }
         mutexReaders.unlock();
+        SynchroController::getInstance()->pause();
     }
 
     virtual void unlockReader() {

@@ -1,12 +1,10 @@
 
 #include <QApplication>
-<<<<<<< HEAD
-#include <QKeyEvent>
-=======
 #include <QThread>
 #include <iostream>
+#include <string>
+#include <sstream>
 
->>>>>>> sydney
 #include "synchrocontroller.h"
 #include "readerwriterprioreadermut.h"
 #include "ireaderwriter.h"
@@ -54,7 +52,8 @@ public:
 
 int main(int argc, char *argv[])
 {
-    int input = 0;
+    std::string input;
+    int intInput;
 
     Reader* readerThreads[NB_READERS];
     Writer* writerThreads[NB_WRITERS];
@@ -88,18 +87,22 @@ int main(int argc, char *argv[])
 
     bool continuing = true;
 
+    // The keycodes we get for <Enter> and <esc> are not the ones expected. In fact,
+    // <Enter> should be 13 and <esc> should be 27
     while (continuing) {
         // Wait for a key press
-        std::cout << "Push on Enter to continue ..." << std::endl;
+        std::cout << "Push on <Enter> to continue or <esc> to stop ..." << std::endl;
+
         input = std::cin.get();
-        std::cout << "value of input : " << input << std::endl;
+        std::istringstream buffer(input);
+        buffer >> intInput;
+
         // If key was <Enter>
-        if (input == 0) {
-            std::cout << "Hello I'm in the while loop" << std::endl;
-            //SynchroController::getInstance()->resume();
+        if (intInput == 32) {
+            SynchroController::getInstance()->resume();
         }
         // If key was <esc>
-        else if (input == 27) {
+        else if (intInput == 0) {
             continuing = false;
         }
     }
@@ -110,13 +113,20 @@ int main(int argc, char *argv[])
         writerThreads[i]->terminate();
     }
 
+    for(size_t i = 0; i < NB_READERS; i++) {
+        readerThreads[i]->terminate();
+    }
+
+
     for(size_t i = 0; i < NB_WRITERS; i++) {
         delete writerThreads[i];
     }
 
-    delete resource;
+    for(size_t i = 0; i < NB_READERS; i++) {
+        delete readerThreads[i];
+    }
 
-    std::cout << "Hello I'm finishing the program" << std::endl;
+    std::cout << "Program finised" << std::endl;
 
     return 0;
 
