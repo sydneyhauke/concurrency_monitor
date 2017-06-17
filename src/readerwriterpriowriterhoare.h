@@ -11,7 +11,10 @@ protected:
     Condition reader;
     int nbReaders, nbWriters;
 public:
-    readerwriterpriowriterhoare();
+    readerwriterpriowriterhoare() :
+        nbReaders(0),
+        nbWriters(0)
+    {}
 
     virtual void lockReader() {
         monitorIn();

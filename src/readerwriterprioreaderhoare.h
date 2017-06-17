@@ -11,7 +11,9 @@ protected:
     int nbReaders;
 
 public:
-    readerwriterprioreaderhoare();
+    readerwriterprioreaderhoare() :
+        nbReaders(0)
+    {}
 
     virtual void lockReader() {
         monitorIn();
