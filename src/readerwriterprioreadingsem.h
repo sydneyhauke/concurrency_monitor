@@ -2,13 +2,13 @@
 #define READERWRITERPRIOREADINGSEM_H
 
 #include "ireaderwriter.h"
-
+#include "osemaphore.h"
 
 class readerwriterprioreadingsem : public IReaderWriter
 {
 protected:
-    QSemaphore mutexReaders;
-    QSemaphore writer;
+    OSemaphore mutexReaders;
+    OSemaphore writer;
     int nbReaders;
 
 public:
