@@ -7,17 +7,22 @@
 class readerwriterprioreaderhoare : public IReaderWriter, public OHoareMonitor
 {
 protected:
-    Condition writer;
-    int nbReaders;
+    Condition writer, reader;
+    int nbReaders, nbWriters;
+    bool busy;
 
 public:
-    readerwriterprioreaderhoare();
+    readerwriterprioreaderhoare() :
+        nbReaders(0),
+        nbWriters(0),
+        busy(false)
+    {}
 
     virtual void lockReader() {
         monitorIn();
         nbReaders++;
-        if(nbReaders == 1) {
-            wait(writer);
+        if (busy) {
+            wait(reader);
         }
         monitorOut();
     }
@@ -33,13 +38,27 @@ public:
 
     virtual void lockWriter() {
         monitorIn();
-        wait(writer);
+
+        if (busy || nbReaders > 0) {
+            wait(writer);
+        }
+
+        busy = true;
         monitorOut();
     }
 
     virtual void unlockWriter() {
         monitorIn();
-        signal(writer);
+        busy = false;
+
+        if (nbReaders > 0) {
+            signal(reader);
+        } else {
+            // On essaie quand même de réveiller un writer,
+            // même s'il n'y en a pas.
+            signal(writer);
+        }
+
         monitorOut();
     }
 };

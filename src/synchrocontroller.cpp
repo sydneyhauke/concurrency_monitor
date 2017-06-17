@@ -18,7 +18,6 @@ void SynchroController::pause()
 {
     barrier.acquire();
     std::cout << "Program paused" << std::endl;
-    WaitingLogger::getInstance()->updateView();
 }
 
 void SynchroController::resume()
