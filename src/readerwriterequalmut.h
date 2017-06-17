@@ -3,14 +3,17 @@
 
 #include "ireaderwriter.h"
 #include "omutex.h"
+#include <vector>
 
 class readerwriterequalmut : public IReaderWriter
 {
 protected:
     OMutex mutex;
-    OMutex fifo;
     OMutex writer;
     int nbReaders;
+    std::vector<int> waitingIds;
+    int currentId;
+    int toRealeaseId;
 
 public:
 
@@ -18,37 +21,40 @@ public:
         mutex(1),
         fifo(1),
         writer(1),
-        nbReaders(0)
+        nbReaders(0),
+        currentId(0),
+        toRealeaseId(-1)
     {}
 
     virtual void lockReader() {
-        fifo.lock();
         mutex.lock();
-        nbReaders++;
-        if (nbReaders == 1) {
-            writer.lock();
+        if (nbReaders > 0) {
+            int id = currentId++;
+            waitingIds.push_back(id);
+            while (nbReaders > 0 && (toRealeaseId!= id)) {
+                writer.unlock();
+            }
         }
         mutex.unlock();
-        fifo.unlock();
     }
 
     virtual void unlockReader() {
         mutex.lock();
         nbReaders--;
-        if (nbReaders == 0) {
+        if (waitingIds.size() > 0) {
+            toRealeaseId = waitingIds[0];
+            waitingIds.erase(0);
             writer.unlock();
         }
         mutex.unlock();
     }
 
     virtual void lockWriter() {
-        fifo.lock();
         writer.lock();
     }
 
     virtual void unlockWriter() {
         writer.unlock();
-        fifo.unlock();
     }
 
 

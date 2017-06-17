@@ -11,7 +11,7 @@ protected:
     OMutex mutexWriters;
     OMutex writer;
     OMutex reader;
-    OMutex mutex;
+    bool writing;
     int nbReaders, nbWriters;
 
 public:
@@ -20,31 +20,51 @@ public:
         mutexWriters(1),
         writer(1),
         reader(1),
-        mutex(1),
+        writing(false),
         nbReaders(0),
         nbWriters(0)
     {}
 
     virtual void lockReader() {
         mutexReaders.lock();
-
-        if (nbWriters > 0 || )
-
+        nbReaders++;
+        while (writing && nbWriters > 0) {
+            reader.lock();
+        }
         mutexReaders.unlock();
     }
 
     virtual void unlockReader() {
         mutexReaders.lock();
-
+        nbReaders--;
+        if (nbWriters > 0) {
+            writer.unlock();
+        } else {
+            reader.unlock();
+        }
         mutexReaders.unlock();
     }
 
     virtual void lockWriter() {
-
+        mutexWriters.lock();
+        nbWriters++;
+        if (nbWriters == 1) {
+            writer.lock();
+        }
+        writing = true;
+        mutexWriters.unlock();
     }
 
     virtual void unlockWriter() {
-
+        mutexWriters.lock();
+        writing = false;
+        nbWriters--;
+        if (nbWriters > 0) {
+            writer.unlock();
+        } else if (nbReaders > 0) {
+            reader.unlock();
+        }
+        mutexWriters.unlock();
     }
 };
 
