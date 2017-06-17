@@ -13,13 +13,9 @@ protected:
 
 public:
     readerwriterprioreaderhoare() :
-<<<<<<< HEAD
         nbReaders(0),
         nbWriters(0),
         busy(false)
-=======
-        nbReaders(0)
->>>>>>> 51b25add6e5e25d9de67612f47f6ac2681c82263
     {}
 
     virtual void lockReader() {

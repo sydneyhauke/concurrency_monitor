@@ -25,17 +25,23 @@ protected:
     Condition accessing;
     int nbReaders;
     bool writing;
+    bool firstWriter;
+    bool firstReader;
 
 public:
     readerwriterequalhoare() :
         fifo(1),
         nbReaders(0),
         accessing(1),
-        writing(false)
+        writing(false),
+        firstWriter(true)
     {}
 
     virtual void lockReader() {
-        wait(fifo);
+        if (!firstReader || !firstWriter ) {
+            wait(fifo);
+        }
+        firstReader = false;
         monitorIn();
         nbReaders++;
         while (nbReaders == 1 && writing) {
@@ -55,7 +61,10 @@ public:
     }
 
     virtual void lockWriter() {
-        wait(fifo);
+        if (!firstWriter || !firstReader) {
+            wait(fifo);
+        }
+        firstWriter = false;
         monitorIn();
         if (nbReaders > 0) {
             wait(accessing);
