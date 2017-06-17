@@ -84,6 +84,7 @@ int main(int argc, char *argv[])
     while (continuing) {
         // Wait for a key press
 
+
         // If key is <enter>
         SynchroController::getInstance()->resume();
 

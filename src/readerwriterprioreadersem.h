@@ -4,7 +4,7 @@
 #include "osemaphore.h"
 #include "ireaderwriter.h"
 
-class readerwriterprioreaderSem
+class readerwriterprioreaderSem : public IReaderWriter
 {
 protected:
     OSemaphore mutexReaders;
