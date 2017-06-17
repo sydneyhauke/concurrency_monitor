@@ -14,20 +14,19 @@ protected:
 
 public:
     readerwriterprioreadermut() :
-        mutexReaders(),
-        mutexWriters(),
-        writer(),
+        mutexReaders(1),
+        mutexWriters(1),
+        writer(1),
         nbReaders(0)
     {}
 
     virtual void lockReader() {
         mutexReaders.lock();
         nbReaders++;
-        if(nbReaders == 1) {
+        if (nbReaders == 1) {
             writer.lock();
         }
         mutexReaders.unlock();
-        SynchroController::getInstance()->pause();
     }
 
     virtual void unlockReader() {

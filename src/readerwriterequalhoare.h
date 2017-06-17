@@ -21,25 +21,34 @@
 class readerwriterequalhoare : public IReaderWriter, public OHoareMonitor
 {
 protected:
-    OSemaphore fifo;
+    Condition fifo;
     Condition accessing;
     int nbReaders;
+    bool writing;
+    bool firstWriter;
+    bool firstReader;
 
 public:
     readerwriterequalhoare() :
         fifo(1),
-        nbReaders(0)
+        nbReaders(0),
+        accessing(1),
+        writing(false),
+        firstWriter(true)
     {}
 
     virtual void lockReader() {
+        if (!firstReader || !firstWriter ) {
+            wait(fifo);
+        }
+        firstReader = false;
         monitorIn();
-        fifo.acquire();
         nbReaders++;
-        if (nbReaders == 1) {
+        while (nbReaders == 1 && writing) {
             wait(accessing);
         }
-        fifo.release();
         monitorOut();
+        signal(fifo);
     }
 
     virtual void unlockReader() {
@@ -48,22 +57,28 @@ public:
         if (nbReaders == 0) {
             signal(accessing);
         }
-        //fifo.release();
         monitorOut();
     }
 
     virtual void lockWriter() {
+        if (!firstWriter || !firstReader) {
+            wait(fifo);
+        }
+        firstWriter = false;
         monitorIn();
-        fifo.acquire();
-        wait(accessing);
+        if (nbReaders > 0) {
+            wait(accessing);
+        }
+        writing = true;
         monitorOut();
     }
 
     virtual void unlockWriter() {
         monitorIn();
+        writing = false;
         signal(accessing);
-        fifo.release();
         monitorOut();
+        signal(fifo);
     }
 };
 

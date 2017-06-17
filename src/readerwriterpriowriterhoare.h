@@ -9,27 +9,36 @@ class readerwriterpriowriterhoare : public IReaderWriter, public OHoareMonitor
 protected:
     Condition writer;
     Condition reader;
-    int nbReaders, nbWriters;
+    int nbReadersAccessing, nbWriters;
+    bool reading, writing;
 public:
     readerwriterpriowriterhoare() :
-        nbReaders(0),
-        nbWriters(0)
+        nbReadersAccessing(0),
+        nbWriters(0),
+        reading(false),
+        writing(false)
     {}
 
     virtual void lockReader() {
         monitorIn();
-        nbReaders++;
-        if(nbReaders == 1) {
-            wait(writer);
+        if (nbWriters > 0 || writing) {
+            wait(reader);
         }
+
+        nbReadersAccessing++;
+        reading = true;
         monitorOut();
     }
 
     virtual void unlockReader() {
         monitorIn();
-        nbReaders--;
-        if(nbReaders == 0) {
+        nbReadersAccessing--;
+
+        if (nbWriters > 0 && nbReadersAccessing == 0) {
+            reading = false;
             signal(writer);
+        } else if (nbWriters == 0) {
+            signal(reader);
         }
         monitorOut();
     }
@@ -37,18 +46,20 @@ public:
     virtual void lockWriter() {
         monitorIn();
         nbWriters++;
-        if(nbWriters == 1) {
-            wait(reader);
+        while (reading || writing) {
+            wait(writer);
         }
+        writing = true;
         monitorOut();
-        wait(writer);
     }
 
     virtual void unlockWriter() {
-        signal(writer);
         monitorIn();
+        writing = false;
         nbWriters--;
-        if(nbWriters == 0) {
+        if (nbWriters > 0) {
+            signal(writer);
+        } else {
             signal(reader);
         }
         monitorOut();

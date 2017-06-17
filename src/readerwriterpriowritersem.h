@@ -31,7 +31,6 @@ public:
         mutex.acquire();
         nbReaders++;
         if (nbReaders == 1) {
-            SynchroController.getInstance()->pause();
             writer.acquire();
         }
         mutex.release();
