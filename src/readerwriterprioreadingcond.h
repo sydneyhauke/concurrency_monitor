@@ -41,11 +41,11 @@ public:
     }
 
     virtual void lockWriter() {
-        wait(writer);
+        writer.wait(mutexReaders);
     }
 
     virtual void unlockWriter() {
-        signal(writer);
+        writer.wakeOne();
     }
 
 };
