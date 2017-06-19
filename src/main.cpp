@@ -1,3 +1,15 @@
+/**
+  \file main.cpp
+  \author Sydney Hauke, Thuy-My Tran, Yosra Harbaoui et Denise Gemesio
+  \date 19.06.2017
+  \brief Classe main du projet. Entre autres, elle :
+  *              - Crée des threads rédacteurs et lecteurs
+  *              - Démarre les threads à des instants aléatoires
+  *              - Crée une ressource
+  *              - Permet d'avancer ou arrêter le programme
+  *
+*/
+
 
 #include <QApplication>
 #include <QThread>
