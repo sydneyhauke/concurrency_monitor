@@ -37,4 +37,8 @@ HEADERS  +=  \
     src/readerwriterpriowriterhoare.h \
     src/readerwriterequalhoare.h \
     src/readerwriterprioreadermut.h \
-    src/readerwriterequalcond.h
+    src/readerwriterequalcond.h \
+    src/readerwriterprioreadingcond.h \
+    src/readerwriterprioreadinghoare.h \
+    src/readerwriterprioreadingmut.h \
+    src/readerwriterprioreadingsem.h

@@ -27,9 +27,13 @@ public:
 
     virtual void lockReader() {
         mutex.lock();
+        nbReaders++;
+
         if (nbReaders > 0) {
+
             int id = currentId++;
             waitingIds.push_back(id);
+
             while (nbReaders > 0 && (toRealeaseId!= id)) {
                 writer.unlock();
             }
@@ -38,13 +42,16 @@ public:
     }
 
     virtual void unlockReader() {
+
         mutex.lock();
         nbReaders--;
+
         if (waitingIds.size() > 0) {
             toRealeaseId = waitingIds[0];
             waitingIds.erase(0);
             writer.unlock();
         }
+
         mutex.unlock();
     }
 
