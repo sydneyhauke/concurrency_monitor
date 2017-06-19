@@ -1,8 +1,11 @@
 #ifndef READERWRITERPRIOREADERHOARE_H
 #define READERWRITERPRIOREADERHOARE_H
 
+#include <QThread>
+
 #include "ireaderwriter.h"
 #include "ohoaremonitor.h"
+#include "waitinglogger.h"
 
 class readerwriterprioreaderhoare : public IReaderWriter, public OHoareMonitor
 {
@@ -22,7 +25,9 @@ public:
         monitorIn();
         nbReaders++;
         if (busy) {
+            WaitingLogger::getInstance()->addWaiting(QThread::currentThread()->objectName(), "reader");
             wait(reader);
+            WaitingLogger::getInstance()->removeWaiting(QThread::currentThread()->objectName(), "reader");
         }
         monitorOut();
     }
@@ -40,7 +45,9 @@ public:
         monitorIn();
 
         if (busy || nbReaders > 0) {
+            WaitingLogger::getInstance()->addWaiting(QThread::currentThread()->objectName(), "writer");
             wait(writer);
+            WaitingLogger::getInstance()->removeWaiting(QThread::currentThread()->objectName(), "writer");
         }
 
         busy = true;

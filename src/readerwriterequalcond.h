@@ -5,6 +5,9 @@
 #include "osemaphore.h"
 #include "owaitcondition.h"
 #include "omutex.h"
+#include "waitinglogger.h"
+
+#include <QThread>
 
 class readerwriterequalcond : public IReaderWriter
 {
@@ -15,6 +18,7 @@ protected:
     bool first;
     int nbReaders;
     int nbWriters;
+    WaitingLogger *wlInstance;
 
 public:
 
@@ -24,10 +28,19 @@ public:
         first(true),
         nbReaders(0),
         nbWriters(0)
-    {}
+    {
+        wlInstance = WaitingLogger::getInstance();
+    }
 
     virtual void lockReader() {
+        wlInstance->addWaiting(QThread::objectName(), "fifo");
+        fifo.acquire();
+        wlInstance->removeWaiting(QThread::objectName(), "fifo");
+
+        wlInstance->addWaiting(QThread::objectName(), "mutex");
         mutex.acquire();
+        wlInstance->removeWaiting(QThread::objectName(), "mutex");
+
         nbReaders++;
         mutex.release();
 
@@ -35,7 +48,9 @@ public:
         mutex.acquire();
 
         if (!first) {
+            wlInstance->addWaiting(QThread::objectName(), "accessor");
             accessor.wait(&mutex);
+            wlInstance->removeWaiting(QThread::objectName(), "accessor");
         }
 
         first = false;
@@ -60,11 +75,14 @@ public:
         mutex.acquire();
         nbWriters++;
         mutex.release();
-
+        wlInstance->addWaiting(QThread::objectName(), "fifo");
         fifo.acquire();
+        wlInstance->removeWaiting(QThread::objectName(), "fifo");
 
         if (!first) {
+            wlInstance->addWaiting(QThread::objectName(), "accessor");
             accessor.wait(&mutex);
+            wlInstance->removeWaiting(QThread::objectName(), "accessor");
         }
 
         first = false;

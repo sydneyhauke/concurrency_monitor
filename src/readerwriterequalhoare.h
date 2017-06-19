@@ -16,7 +16,9 @@
 #include "ireaderwriter.h"
 #include "osemaphore.h"
 #include "ohoaremonitor.h"
+#include "waitinglogger.h"
 
+#include <QThread>
 
 class readerwriterequalhoare : public IReaderWriter, public OHoareMonitor
 {
@@ -27,6 +29,7 @@ protected:
     bool writing;
     bool firstWriter;
     bool firstReader;
+    WaitingLogger *wlInstance;
 
 public:
     readerwriterequalhoare() :
@@ -35,17 +38,23 @@ public:
         accessing(1),
         writing(false),
         firstWriter(true)
-    {}
+    {
+        wlInstance = WaitingLogger::getInstance();
+    }
 
     virtual void lockReader() {
         if (!firstReader || !firstWriter ) {
+            wlInstance->addWaiting(QThread::objectName(), "fifo");
             wait(fifo);
+            wlInstance->removeWaiting(QThread::objectName(), "fifo");
         }
         firstReader = false;
         monitorIn();
         nbReaders++;
         while (nbReaders == 1 && writing) {
+            wlInstance->addWaiting(QThread::objectName(), "accessing");
             wait(accessing);
+            wlInstance->removeWaiting(QThread::objectName(), "accessing");
         }
         monitorOut();
         signal(fifo);
@@ -62,12 +71,16 @@ public:
 
     virtual void lockWriter() {
         if (!firstWriter || !firstReader) {
+            wlInstance->addWaiting(QThread::objectName(), "fifo");
             wait(fifo);
+            wlInstance->removeWaiting(QThread::objectName(), "fifo");
         }
         firstWriter = false;
         monitorIn();
         if (nbReaders > 0) {
+            wlInstance->addWaiting(QThread::objectName(), "accessing");
             wait(accessing);
+            wlInstance->removeWaiting(QThread::objectName(), "accessing");
         }
         writing = true;
         monitorOut();

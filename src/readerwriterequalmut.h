@@ -3,8 +3,11 @@
 
 #include "ireaderwriter.h"
 #include "omutex.h"
+#include "waitinglogger.h"
+
 #include <vector>
 #include <algorithm>
+#include <QThread>
 
 class readerwriterequalmut : public IReaderWriter
 {
@@ -18,6 +21,8 @@ protected:
     bool readerAccessing;
     bool first;
 
+    WaitingLogger *wlInstance;
+
 public:
 
     readerwriterequalmut() :
@@ -28,7 +33,9 @@ public:
         toRealeaseId(-1),
         readerAccessing(false),
         first(true)
-    {}
+    {
+        wlInstance = WaitingLogger::getInstance();
+    }
 
     virtual void lockReader() {
         mutex.lock();
@@ -82,6 +89,9 @@ public:
         first = false;
 
         mutex.unlock();
+        wlInstance->addWaiting(QThread::objectName(), "writer");
+        writer.lock();
+        wlInstance->removeWaiting(QThread::objectName(), "writer");
     }
 
     virtual void unlockWriter() {
