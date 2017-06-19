@@ -19,17 +19,17 @@
 
 #include "synchrocontroller.h"
 
-#include "readerwriterequalcond.h"
+/*#include "readerwriterequalcond.h"
 #include "readerwriterequalhoare.h"
 #include "readerwriterequalmut.h"
 #include "readerwriterequalsem.h"
 
 #include "readerwriterprioreadercond.h"
 #include "readerwriterprioreaderhoare.h"
-#include "readerwriterprioreadermut.h"
+#include "readerwriterprioreadermut.h"*/
 #include "readerwriterprioreadersem.h"
 
-#include "readerwriterprioreadingcond.h"
+/*#include "readerwriterprioreadingcond.h"
 #include "readerwriterprioreadinghoare.h"
 #include "readerwriterprioreadingmut.h"
 #include "readerwriterprioreadingsem.h"
@@ -37,7 +37,7 @@
 #include "readerwriterpriowritercond.h"
 #include "readerwriterpriowriterhoare.h"
 #include "readerwriterpriowritermut.h"
-#include "readerwriterpriowritersem.h"
+#include "readerwriterpriowritersem.h"*/
 
 #include "ireaderwriter.h"
 #include "waitinglogger.h"
@@ -48,12 +48,24 @@
 class Writer : public QThread {
 private :
     IReaderWriter *_resource;
+    bool _shouldTerminate;
+    static QSemaphore sem;
 
 public:
-    Writer(IReaderWriter *resource) : _resource(resource) {}
+    Writer(IReaderWriter *resource) : _resource(resource), _shouldTerminate(false) {}
+    ~Writer() {
+        _shouldTerminate = true;
+        sem.release();
+    }
 
     void run() Q_DECL_OVERRIDE {
         while(1) {
+            sem.acquire();
+            if(_shouldTerminate) {
+                break;
+            }
+            sem.release();
+
             _resource->lockWriter();
             ((ReadWriteLogger*)ReadWriteLogger::getInstance())->addResourceAccess(this->objectName());
 
@@ -67,15 +79,34 @@ public:
     }
 };
 
+QSemaphore Writer::sem(1);
+
+/**
+ * @brief The Reader class
+ *
+ * Simple thread class that acts as a reader on a resource
+ */
 class Reader : public QThread {
 private:
     IReaderWriter *_resource;
+    bool _shouldTerminate;
+    static QSemaphore sem;
 
 public:
-    Reader(IReaderWriter *resource) : _resource(resource){}
+    Reader(IReaderWriter *resource) : _resource(resource), _shouldTerminate(false) {}
+    ~Reader() {
+        _shouldTerminate = true;
+        sem.release();
+    }
 
     void run() Q_DECL_OVERRIDE {
         while(1) {
+            sem.acquire();
+            if(_shouldTerminate) {
+                break;
+            }
+            sem.release();
+
             _resource->lockReader();
             ((ReadWriteLogger*)ReadWriteLogger::getInstance())->addResourceAccess(this->objectName());
 
@@ -89,6 +120,8 @@ public:
     }
 };
 
+QSemaphore Reader::sem(1);
+
 int main(int argc, char *argv[])
 {
     int input;
@@ -97,7 +130,7 @@ int main(int argc, char *argv[])
     Writer* writerThreads[NB_WRITERS];
 
     // Create the resource manager object
-    IReaderWriter *resource = new readerwriterprioreaderhoare();
+    IReaderWriter *resource = new readerwriterprioreaderSem();
 
     // Create the threads
     for(size_t i = 0; i < NB_READERS; i++) {
@@ -147,17 +180,7 @@ int main(int argc, char *argv[])
 
     }
 
-    // Kill the threads
-    // Like, really ? killing ?...
-    for(size_t i = 0; i < NB_WRITERS; i++) {
-        writerThreads[i]->terminate();
-    }
-
-    for(size_t i = 0; i < NB_READERS; i++) {
-        readerThreads[i]->terminate();
-    }
-
-
+    /* Destroy a single thread at a time */
     for(size_t i = 0; i < NB_WRITERS; i++) {
         delete writerThreads[i];
     }
@@ -169,8 +192,6 @@ int main(int argc, char *argv[])
     std::cout << "Program finised" << std::endl;
 
     return 0;
-
-
 
     // Pour ceux qui voudraient développer une version graphique
 //    QApplication a(argc, argv);

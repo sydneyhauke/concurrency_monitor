@@ -80,7 +80,6 @@ void WaitingLogger::removeWaiting(const QString& threadName, const QString& obje
 }
 
 
-
 void WaitingLogger::updateView()
 {
     for(QList<WaitingQueue *>::iterator itQueue = waitingQueues.begin(); itQueue != waitingQueues.end(); itQueue++) {
