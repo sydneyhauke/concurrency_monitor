@@ -12,27 +12,33 @@ protected:
     OSemaphore fifo;
     OSemaphore mutex;
     OWaitCondition accessor;
-    int nbReaders;
     bool first;
+    int nbReaders;
+    int nbWriters;
 
 public:
 
     readerwriterequalcond() :
-        accessor(1),
         fifo(1),
         mutex(1),
-        firstReader(true),
-        nbReaders(0)
+        first(true),
+        nbReaders(0),
+        nbWriters(0)
     {}
 
     virtual void lockReader() {
-        fifo.acquire();
         mutex.acquire();
         nbReaders++;
-        if (nbReaders == 1 || !firstReader) {
+        mutex.release();
+
+        fifo.acquire();
+        mutex.acquire();
+
+        if (!first) {
             accessor.wait(&mutex);
         }
-        firstReader = false;
+
+        first = false;
         mutex.release();
         fifo.release();
     }
@@ -40,25 +46,42 @@ public:
     virtual void unlockReader() {
         mutex.acquire();
         nbReaders--;
-        if (nbReaders == 0) {
+
+        if (nbReaders > 0 || nbWriters > 0) {
             accessor.wakeOne();
+        } else {
+            first = true;
         }
+
         mutex.release();
     }
 
     virtual void lockWriter() {
+        mutex.acquire();
+        nbWriters++;
+        mutex.release();
+
         fifo.acquire();
 
-        if (!firstWriter) {
+        if (!first) {
             accessor.wait(&mutex);
         }
 
-        firstWriter = false;
+        first = false;
     }
 
     virtual void unlockWriter() {
+        mutex.acquire();
+        nbWriters--;
+        mutex.release();
+
         fifo.release();
-        accessor.wakeOne();
+
+        if (nbReaders > 0 || nbWriters > 0) {
+           accessor.wakeOne();
+        } else {
+            first = true;
+        }
     }
 
 };

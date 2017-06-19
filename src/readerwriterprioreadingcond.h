@@ -7,45 +7,41 @@
 class readerwriterprioreadingcond : public IReaderWriter
 {
 protected:
-    OMutex mutexReaders;
-    OWaitCondition writer;
+    OSemaphore fifo;
+    OSemaphore mutex;
+    OWaitCondition accessor;
     int nbReaders;
 
 public:
     readerwriterprioreadingcond() :
-        mutexReaders(),
+        fifo(1),
+        mutex(1),
         writer(),
         nbReaders(0)
     {}
 
     virtual void lockReader() {
-        mutexReaders.lock();
-        nbReaders++;
+        mutex.lock();
 
-        if(nbReaders == 1) {
-            wait(writer);
-        }
-
-        mutexReaders.unlock();
+        mutex.unlock();
     }
 
     virtual void unlockReader() {
-        mutexReaders.lock();
-        nbReaders--;
+        mutex.lock();
 
-        if(nbReaders == 0) {
-            signal(writer);
-        }
-
-        mutexReaders.unlock();
+        mutex.unlock();
     }
 
     virtual void lockWriter() {
-        writer.wait(mutexReaders);
+        mutex.lock();
+
+        mutex.unlock();
     }
 
     virtual void unlockWriter() {
-        writer.wakeOne();
+        mutex.lock();
+
+        mutex.unlock();
     }
 
 };

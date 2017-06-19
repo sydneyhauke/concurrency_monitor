@@ -1,5 +1,5 @@
-#ifndef PWAITCONDITION_H
-#define PWAITCONDITION_H
+#ifndef OWAITCONDITION_H
+#define OWAITCONDITION_H
 
 #include <QWaitCondition>
 #include "omutex.h"
@@ -20,4 +20,4 @@ public:
 
 };
 
-#endif // PWAITCONDITION_H
+#endif // OWAITCONDITION_H
