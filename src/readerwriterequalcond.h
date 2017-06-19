@@ -20,7 +20,7 @@ class readerwriterequalcond : public IReaderWriter
 {
 protected:
     OSemaphore fifo;
-    OSemaphore mutex;
+    OMutex mutex;
     OWaitCondition accessor;
     bool first;
     int nbReaders;
@@ -32,7 +32,7 @@ public:
 
     readerwriterequalcond() :
         fifo(1),
-        mutex(1),
+        mutex(),
         first(true),
         nbReaders(0),
         nbWriters(0)
@@ -42,18 +42,18 @@ public:
 
     virtual void lockReader()  {
         wlInstance->addWaiting(QThread::currentThread()->objectName(), "mutex");
-        mutex.acquire();
+        mutex.lock();
         wlInstance->removeWaiting(QThread::currentThread()->objectName(), "mutex");
 
         nbReaders++;
-        mutex.release();
+        mutex.unlock();
 
         // Ajout à la file d'attente
-        wlInstance->addWaiting(QThread::objectName(), "fifo");
+        wlInstance->addWaiting(QThread::currentThread()->objectName(), "fifo");
         fifo.acquire();
-        wlInstance->removeWaiting(QThread::objectName(), "fifo");
+        wlInstance->removeWaiting(QThread::currentThread()->objectName(), "fifo");
 
-        mutex.acquire();
+        mutex.lock();
 
         if (!first) {
             wlInstance->addWaiting(QThread::currentThread()->objectName(), "accessor");
@@ -62,12 +62,12 @@ public:
         }
 
         first = false;
-        mutex.release();
+        mutex.unlock();
         fifo.release();
     }
 
     virtual void unlockReader() {
-        mutex.acquire();
+        mutex.lock();
         nbReaders--;
 
         if (nbReaders > 0 || nbWriters > 0) {
@@ -76,13 +76,13 @@ public:
             first = true;
         }
 
-        mutex.release();
+        mutex.unlock();
     }
 
     virtual void lockWriter() {
-        mutex.acquire();
+        mutex.lock();
         nbWriters++;
-        mutex.release();
+        mutex.unlock();
 
         wlInstance->addWaiting(QThread::currentThread()->objectName(), "fifo");
         fifo.acquire();
@@ -98,9 +98,9 @@ public:
     }
 
     virtual void unlockWriter() {
-        mutex.acquire();
+        mutex.lock();
         nbWriters--;
-        mutex.release();
+        mutex.unlock();
 
         fifo.release();
 

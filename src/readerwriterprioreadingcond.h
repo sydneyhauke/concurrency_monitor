@@ -15,45 +15,45 @@ class readerwriterprioreadingcond : public IReaderWriter
 {
 protected:
     OSemaphore fifo;
-    OSemaphore mutex;
+    OMutex mutex;
     OWaitCondition accessor;
     int nbReaders;
 
 public:
     readerwriterprioreadingcond() :
-        mutex(1),
+        mutex(),
         accessor(),
         nbReaders(0)
     {}
 
     virtual void lockReader() {
-        mutex.acquire();
+        mutex.lock();
         nbReaders++;
         if (nbReaders == 1) {
             accessor.wait(&mutex);
         }
-        mutex.release();
+        mutex.unlock();
     }
 
     virtual void unlockReader() {
-        mutex.acquire();
+        mutex.lock();
         nbReaders--;
         if (nbReaders == 0) {
             accessor.wakeOne();
         }
-        mutex.release();
+        mutex.unlock();
     }
 
     virtual void lockWriter() {
-        mutex.acquire();
+        mutex.lock();
         accessor.wait(&mutex);
-        mutex.release();
+        mutex.unlock();
     }
 
     virtual void unlockWriter() {
-        mutex.acquire();
+        mutex.lock();
         accessor.wait(&mutex);
-        mutex.release();
+        mutex.unlock();
     }
 
 };
