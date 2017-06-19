@@ -3,6 +3,9 @@
 
 #include "omutex.h"
 #include "ireaderwriter.h"
+#include "waitinglogger.h"
+
+#include <QThread>
 
 class readerwriterpriowritermut : public IReaderWriter
 {
@@ -14,6 +17,7 @@ protected:
     bool writing;
     int nbReaders, nbWriters;
 
+    WaitingLogger *wlInstance;
 public:
     readerwriterpriowritermut() :
         mutexReaders(1),
@@ -23,13 +27,20 @@ public:
         writing(false),
         nbReaders(0),
         nbWriters(0)
-    {}
+    {
+        wlInstance = WaitingLogger::getInstance();
+    }
 
     virtual void lockReader() {
+        wlInstance->addWaiting(QThread::objectName(), "mutexReaders");
         mutexReaders.lock();
+        wlInstance->removeWaiting(QThread::objectName(), "mutexReaders");
+
         nbReaders++;
         while (writing && nbWriters > 0) {
+            wlInstance->addWaiting(QThread::objectName(), "reader");
             reader.lock();
+            wlInstance->removeWaiting(QThread::objectName(), "reader");
         }
         mutexReaders.unlock();
     }
@@ -46,10 +57,15 @@ public:
     }
 
     virtual void lockWriter() {
+        wlInstance->addWaiting(QThread::objectName(), "mutexWriters");
         mutexWriters.lock();
+        wlInstance->removeWaiting(QThread::objectName(), "mutexWriters");
+
         nbWriters++;
         if (nbWriters == 1) {
+            wlInstance->addWaiting(QThread::objectName(), "writer");
             writer.lock();
+            wlInstance->removeWaiting(QThread::objectName(), "writer");
         }
         writing = true;
         mutexWriters.unlock();

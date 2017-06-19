@@ -3,6 +3,9 @@
 
 #include "ireaderwriter.h"
 #include "ohoaremonitor.h"
+#include "waitinglogger.h"
+
+#include <QThread>
 
 class readerwriterpriowriterhoare : public IReaderWriter, public OHoareMonitor
 {
@@ -11,18 +14,25 @@ protected:
     Condition reader;
     int nbReadersAccessing, nbWriters;
     bool reading, writing;
+
+    WaitingLogger *wlInstance;
+
 public:
     readerwriterpriowriterhoare() :
         nbReadersAccessing(0),
         nbWriters(0),
         reading(false),
         writing(false)
-    {}
+    {
+        wlInstance = WaitingLogger::getInstance();
+    }
 
     virtual void lockReader() {
         monitorIn();
         if (nbWriters > 0 || writing) {
+            wlInstance->addWaiting(QThread::objectName(), "reader");
             wait(reader);
+            wlInstance->removeWaiting(QThread::objectName(), "reader");
         }
 
         nbReadersAccessing++;
@@ -47,7 +57,9 @@ public:
         monitorIn();
         nbWriters++;
         while (reading || writing) {
+            wlInstance->addWaiting(QThread::objectName(), "writer");
             wait(writer);
+            wlInstance->removeWaiting(QThread::objectName(), "writer");
         }
         writing = true;
         monitorOut();

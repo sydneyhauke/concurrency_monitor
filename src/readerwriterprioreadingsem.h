@@ -3,6 +3,9 @@
 
 #include "ireaderwriter.h"
 #include "osemaphore.h"
+#include "waitinglogger.h"
+
+#include <QThread>
 
 class readerwriterprioreadingsem : public IReaderWriter
 {
@@ -14,6 +17,8 @@ protected:
     int nbWriters;
     bool freeAllReaders;
 
+    WaitingLogger *wlInstance;
+
 public:
     readerwriterprioreadingsem() :
         mutex(1),
@@ -22,14 +27,25 @@ public:
         nbReaders(0),
         nbWriters(0),
         freeAllReaders(false)
-    {}
+    {
+        wlInstance = WaitingLogger::getInstance();
+    }
 
     virtual void lockReader() {
+        wlInstance->addWaiting(QThread::objectName(), "mutex");
         mutex.acquire();
+        wlInstance->removeWaiting(QThread::objectName(), "mutex");
+
         nbReaders++;
         mutex.release();
+
+        wlInstance->addWaiting(QThread::objectName(), "fifo");
         fifo.acquire();
+        wlInstance->removeWaiting(QThread::objectName(), "fifo");
+
+        wlInstance->addWaiting(QThread::objectName(), "accessor");
         accessor.acquire();
+        wlInstance->addWaiting(QThread::objectName(), "accessor");
     }
 
     virtual void unlockReader() {
@@ -56,15 +72,26 @@ public:
     }
 
     virtual void lockWriter() {
+        wlInstance->addWaiting(QThread::objectName(), "mutex");
         mutex.acquire();
+        wlInstance->removeWaiting(QThread::objectName(), "mutex");
+
         nbWriters++;
         mutex.release();
+
+        wlInstance->addWaiting(QThread::objectName(), "fifo");
         fifo.acquire();
+        wlInstance->removeWaiting(QThread::objectName(), "fifo");
 
-        if (freeAllReaders)
+        if (freeAllReaders) {
+            wlInstance->addWaiting(QThread::objectName(), "fifo");
             fifo.acquire();
+            wlInstance->removeWaiting(QThread::objectName(), "fifo");
+        }
 
+        wlInstance->addWaiting(QThread::objectName(), "accessor");
         accessor.acquire();
+        wlInstance->addWaiting(QThread::objectName(), "accessor");
     }
 
     virtual void unlockWriter() {

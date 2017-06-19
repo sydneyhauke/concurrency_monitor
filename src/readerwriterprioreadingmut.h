@@ -3,6 +3,9 @@
 
 #include "ireaderwriter.h"
 #include "omutex.h"
+#include "waitinglogger.h"
+
+#include <QThread>
 
 class readerwriterprioreadingmut : public IReaderWriter {
 protected:
@@ -15,6 +18,8 @@ protected:
     bool readerAccessing;
     bool first;
 
+    WaitingLogger *wlInstance;
+
 public:
 
     readerwriterprioreadingmut() :
@@ -25,10 +30,15 @@ public:
         toRealeaseId(-1),
         readerAccessing(false),
         first(true)
-    {}
+    {
+        wlInstance = WaitingLogger::getInstance();
+    }
 
     virtual void lockReader() {
+        wlInstance->addWaiting(QThread::objectName(), "mutex");
         mutex.lock();
+        wlInstance->removeWaiting(QThread::objectName(), "mutex");
+
         nbReaders++;
 
         if (!first && !readerAccessing) {
@@ -36,7 +46,9 @@ public:
             waitingIds.push_back(id);
 
             while (!first && !readerAccessing && (toRealeaseId!= id)) {
+                wlInstance->addWaiting(QThread::objectName(), "accessor");
                 accessor.lock();
+                wlInstance->removeWaiting(QThread::objectName(), "accessor");
             }
         }
 
@@ -70,14 +82,18 @@ public:
     }
 
     virtual void lockWriter() {
+        wlInstance->addWaiting(QThread::objectName(), "mutex");
         mutex.lock();
+        wlInstance->removeWaiting(QThread::objectName(), "mutex");
 
         if (!first) {
             int id = currentId++;
             waitingIds.push_back(id);
 
             while (toRealeaseId!= id) {
+                wlInstance->addWaiting(QThread::objectName(), "accessor");
                 accessor.lock();
+                wlInstance->removeWaiting(QThread::objectName(), "accessor");
             }
         }
 
@@ -87,7 +103,9 @@ public:
     }
 
     virtual void unlockWriter() {
+        wlInstance->addWaiting(QThread::objectName(), "mutex");
         mutex.lock();
+        wlInstance->removeWaiting(QThread::objectName(), "mutex");
 
         if (waitingIds.size() > 0) {
             toRealeaseId = waitingIds[0];
