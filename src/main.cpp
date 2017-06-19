@@ -134,6 +134,9 @@ int main(int argc, char *argv[])
     Writer* writerThreads[NB_WRITERS];
 
     // Create the resource manager object
+    // =====================================================
+    // NOTE : CHANGE READ_WRITE RESOURCE IMPLEMENTATION HERE
+    // =====================================================
     IReaderWriter *resource = new readerwriterprioreaderSem();
 
     // Create the threads
