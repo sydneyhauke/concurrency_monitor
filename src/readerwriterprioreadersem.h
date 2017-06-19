@@ -1,3 +1,10 @@
+/**
+  \file readerwriterprioreadersem.h
+  \author Sydney Hauke, Thuy-My Tran, Yosra Harbaoui et Denise Gemesio
+  \date 19.06.2017
+  \brief Classe implémentant la priorité lecteur avec des sémaphores
+*/
+
 #ifndef READERWRITERPRIOREADERSEM_H
 #define READERWRITERPRIOREADERSEM_H
 
@@ -17,7 +24,6 @@ protected:
 
 public:
     readerwriterprioreaderSem() :
-
         mutexReaders(1),
         mutexWriters(1),
         writer(1),

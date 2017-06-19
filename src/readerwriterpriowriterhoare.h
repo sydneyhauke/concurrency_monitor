@@ -1,3 +1,10 @@
+/**
+  \file readerwriterpriowriterhoare.h
+  \author Sydney Hauke, Thuy-My Tran, Yosra Harbaoui et Denise Gemesio
+  \date 19.06.2017
+  \brief Classe implémentant la priorité rédacteur avec des moniteurs de Hoare
+*/
+
 #ifndef READERWRITERPRIOWRITERHOARE_H
 #define READERWRITERPRIOWRITERHOARE_H
 

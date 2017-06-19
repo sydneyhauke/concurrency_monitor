@@ -1,3 +1,10 @@
+/**
+  \file readerwriterpriowritersem.h
+  \author Sydney Hauke, Thuy-My Tran, Yosra Harbaoui et Denise Gemesio
+  \date 19.06.2017
+  \brief Classe implémentant la priorité rédacteur avec des sémaphores
+*/
+
 #ifndef READERWRITERPRIOWRITERSEM_H
 #define READERWRITERPRIOWRITERSEM_H
 

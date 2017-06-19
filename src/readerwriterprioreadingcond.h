@@ -1,3 +1,10 @@
+/**
+  \file readerwriterprioreadingcond.h
+  \author Sydney Hauke, Thuy-My Tran, Yosra Harbaoui et Denise Gemesio
+  \date 19.06.2017
+  \brief Classe implémentant la priorité en lecture avec des moniteurs de Mesa
+*/
+
 #ifndef READERWRITERPRIOREADINGCOND_H
 #define READERWRITERPRIOREADINGCOND_H
 
@@ -14,34 +21,39 @@ protected:
 
 public:
     readerwriterprioreadingcond() :
-        fifo(1),
         mutex(1),
-        writer(),
+        accessor(),
         nbReaders(0)
     {}
 
     virtual void lockReader() {
-        mutex.lock();
-
-        mutex.unlock();
+        mutex.acquire();
+        nbReaders++;
+        if (nbReaders == 1) {
+            accessor.wait(&mutex);
+        }
+        mutex.release();
     }
 
     virtual void unlockReader() {
-        mutex.lock();
-
-        mutex.unlock();
+        mutex.acquire();
+        nbReaders--;
+        if (nbReaders == 0) {
+            accessor.wakeOne();
+        }
+        mutex.release();
     }
 
     virtual void lockWriter() {
-        mutex.lock();
-
-        mutex.unlock();
+        mutex.acquire();
+        accessor.wait(&mutex);
+        mutex.release();
     }
 
     virtual void unlockWriter() {
-        mutex.lock();
-
-        mutex.unlock();
+        mutex.acquire();
+        accessor.wait(&mutex);
+        mutex.release();
     }
 
 };

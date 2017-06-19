@@ -1,3 +1,10 @@
+/**
+  \file readerwriterequalcond.h
+  \author Sydney Hauke, Thuy-My Tran, Yosra Harbaoui et Denise Gemesio
+  \date 19.06.2017
+  \brief Classe implémentant la priorité égale avec des moniteurs de Mesa
+*/
+
 #ifndef READERWRITEREQUALCOND_H
 #define READERWRITEREQUALCOND_H
 
@@ -18,6 +25,7 @@ protected:
     bool first;
     int nbReaders;
     int nbWriters;
+
     WaitingLogger *wlInstance;
 
 public:
@@ -33,9 +41,6 @@ public:
     }
 
     virtual void lockReader() {
-        wlInstance->addWaiting(QThread::objectName(), "fifo");
-        fifo.acquire();
-        wlInstance->removeWaiting(QThread::objectName(), "fifo");
 
         wlInstance->addWaiting(QThread::objectName(), "mutex");
         mutex.acquire();
@@ -44,7 +49,11 @@ public:
         nbReaders++;
         mutex.release();
 
+        // Ajout à la file d'attente
+        wlInstance->addWaiting(QThread::objectName(), "fifo");
         fifo.acquire();
+        wlInstance->removeWaiting(QThread::objectName(), "fifo");
+
         mutex.acquire();
 
         if (!first) {
@@ -75,6 +84,8 @@ public:
         mutex.acquire();
         nbWriters++;
         mutex.release();
+
+        //Ajout à la file d'attente
         wlInstance->addWaiting(QThread::objectName(), "fifo");
         fifo.acquire();
         wlInstance->removeWaiting(QThread::objectName(), "fifo");

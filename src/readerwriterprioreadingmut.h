@@ -1,3 +1,11 @@
+/**
+  \file readerwriterprioreadingmut.h
+  \author Sydney Hauke, Thuy-My Tran, Yosra Harbaoui et Denise Gemesio
+  \date 19.06.2017
+  \brief Classe implémentant la priorité en lecture avec des mutex
+*/
+
+
 #ifndef READERWRITERPRIOREADINGMUT_H
 #define READERWRITERPRIOREADINGMUT_H
 

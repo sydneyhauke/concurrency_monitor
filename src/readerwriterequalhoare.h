@@ -1,13 +1,8 @@
 /**
-  \file cppmain.cpp
-  \author Yosra Harbaoui et Denise Gemesio
-  \date 26.04.2017
-  \brief Classe main configurant les données de base des locomotives
-  et démarrant le programme
-  *
-  * Nous n'avons ici pas besoin d'utiliser un mutex vu que le monitorIn/Out se charge
-  * de ce rôle.
-  *
+  \file readerwriterequalhoare.h
+  \author Sydney Hauke, Thuy-My Tran, Yosra Harbaoui et Denise Gemesio
+  \date 19.06.2017
+  \brief Classe implémentant la priorité égale avec des moniteurs de Hoare
 */
 
 #ifndef READERWRITEREQUALHOARE_H
@@ -32,6 +27,7 @@ protected:
     WaitingLogger *wlInstance;
 
 public:
+
     readerwriterequalhoare() :
         fifo(1),
         nbReaders(0),
@@ -41,6 +37,7 @@ public:
     {
         wlInstance = WaitingLogger::getInstance();
     }
+
 
     virtual void lockReader() {
         if (!firstReader || !firstWriter ) {

@@ -1,3 +1,10 @@
+/**
+  \file readerwriterprioreadingsem.h
+  \author Sydney Hauke, Thuy-My Tran, Yosra Harbaoui et Denise Gemesio
+  \date 19.06.2017
+  \brief Classe implémentant la priorité en lecture avec des sémaphores
+*/
+
 #ifndef READERWRITERPRIOREADINGSEM_H
 #define READERWRITERPRIOREADINGSEM_H
 
@@ -13,8 +20,6 @@ protected:
     OSemaphore mutex;
     OSemaphore accessor;
     int nbReaders;
-    int nbWriters;
-    bool freeAllReaders;
 
     WaitingLogger *wlInstance;
 
@@ -22,9 +27,7 @@ public:
     readerwriterprioreadingsem() :
         mutex(1),
         accessor(1),
-        nbReaders(0),
-        nbWriters(0),
-        freeAllReaders(false)
+        nbReaders(0)
     {
         wlInstance = WaitingLogger::getInstance();
     }

@@ -1,3 +1,10 @@
+/**
+  \file readerwriterpriowritercond.h
+  \author Sydney Hauke, Thuy-My Tran, Yosra Harbaoui et Denise Gemesio
+  \date 19.06.2017
+  \brief Classe implémentant la priorité rédacteur avec des moniteurs de Mesa
+*/
+
 #ifndef READERWRITERPRIOWRITERCOND_H
 #define READERWRITERPRIOWRITERCOND_H
 
