@@ -19,7 +19,6 @@ public:
 
     readerwriterequalmut() :
         mutex(1),
-        fifo(1),
         writer(1),
         nbReaders(0),
         currentId(0),

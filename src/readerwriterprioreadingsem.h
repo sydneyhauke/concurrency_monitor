@@ -7,46 +7,69 @@
 class readerwriterprioreadingsem : public IReaderWriter
 {
 protected:
-    OSemaphore mutexReaders;
-    OSemaphore writer;
+    OSemaphore mutex;
+    OSemaphore fifo;
+    OSemaphore accessor;
     int nbReaders;
+    int nbWriters;
+    bool freeAllReaders;
 
 public:
     readerwriterprioreadingsem() :
-        mutexReaders(1),
-        writer(1),
-        nbReaders(0)
+        mutex(1),
+        fifo(1),
+        accessor(1),
+        nbReaders(0),
+        nbWriters(0),
+        freeAllReaders(false)
     {}
 
     virtual void lockReader() {
-        mutexReaders.acquire();
+        mutex.acquire();
         nbReaders++;
-
-        if (nbReaders == 1) {
-            writer.acquire();
-        }
-
-        mutexReaders.release();
+        mutex.release();
+        fifo.acquire();
+        accessor.acquire();
     }
 
     virtual void unlockReader() {
-        mutexReaders.acquire();
-        nbReaders -= 1;
+        mutex.acquire();
+        nbReaders--;
 
-        if (nbReaders == 0) {
-            writer.release();
+        if (nbReaders > 0 && !freeAllReaders) {
+
+            freeAllReaders = true;
+
+            for (int i = 0; i < nbReaders + nbWriters; ++i)
+                fifo.release();
+
+            for (int i = 0; i < nbReaders; ++i)
+                accessor.release();
+
+        } else if (nbReaders == 0) {
+            freeAllReaders = false;
+            accessor.release();
+            fifo.release();
         }
 
-        mutexReaders.release();
+        mutex.release();
     }
 
     virtual void lockWriter() {
-        writer.acquire();
+        mutex.acquire();
+        nbWriters++;
+        mutex.release();
+        fifo.acquire();
+
+        if (freeAllReaders)
+            fifo.acquire();
+
+        accessor.acquire();
     }
 
     virtual void unlockWriter() {
-        writer.release();
-    }
-};
+        accessor.release();
+        fifo.release();
+    }};
 
 #endif // READERWRITERPRIOREADINGSEM_H
