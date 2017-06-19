@@ -43,9 +43,9 @@ public:
     }
 
     virtual void lockReader() {
-        wlInstance->addWaiting(QThread::objectName(), "mutex");
+        wlInstance->addWaiting(QThread::currentThread()->objectName(), "mutex");
         mutex.lock();
-        wlInstance->removeWaiting(QThread::objectName(), "mutex");
+        wlInstance->removeWaiting(QThread::currentThread()->objectName(), "mutex");
 
         nbReaders++;
 
@@ -54,9 +54,9 @@ public:
             waitingIds.push_back(id);
 
             while (!first && !readerAccessing && (toRealeaseId!= id)) {
-                wlInstance->addWaiting(QThread::objectName(), "accessor");
+                wlInstance->addWaiting(QThread::currentThread()->objectName(), "accessor");
                 accessor.lock();
-                wlInstance->removeWaiting(QThread::objectName(), "accessor");
+                wlInstance->removeWaiting(QThread::currentThread()->objectName(), "accessor");
             }
         }
 
@@ -90,18 +90,18 @@ public:
     }
 
     virtual void lockWriter() {
-        wlInstance->addWaiting(QThread::objectName(), "mutex");
+        wlInstance->addWaiting(QThread::currentThread()->objectName(), "mutex");
         mutex.lock();
-        wlInstance->removeWaiting(QThread::objectName(), "mutex");
+        wlInstance->removeWaiting(QThread::currentThread()->objectName(), "mutex");
 
         if (!first) {
             int id = currentId++;
             waitingIds.push_back(id);
 
             while (toRealeaseId!= id) {
-                wlInstance->addWaiting(QThread::objectName(), "accessor");
+                wlInstance->addWaiting(QThread::currentThread()->objectName(), "accessor");
                 accessor.lock();
-                wlInstance->removeWaiting(QThread::objectName(), "accessor");
+                wlInstance->removeWaiting(QThread::currentThread()->objectName(), "accessor");
             }
         }
 
@@ -111,9 +111,9 @@ public:
     }
 
     virtual void unlockWriter() {
-        wlInstance->addWaiting(QThread::objectName(), "mutex");
+        wlInstance->addWaiting(QThread::currentThread()->objectName(), "mutex");
         mutex.lock();
-        wlInstance->removeWaiting(QThread::objectName(), "mutex");
+        wlInstance->removeWaiting(QThread::currentThread()->objectName(), "mutex");
 
         if (waitingIds.size() > 0) {
             toRealeaseId = waitingIds[0];

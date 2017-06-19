@@ -37,9 +37,9 @@ public:
     virtual void lockReader() {
         monitorIn();
         if (nbWriters > 0 || writing) {
-            wlInstance->addWaiting(QThread::objectName(), "reader");
+            wlInstance->addWaiting(QThread::currentThread()->objectName(), "reader");
             wait(reader);
-            wlInstance->removeWaiting(QThread::objectName(), "reader");
+            wlInstance->removeWaiting(QThread::currentThread()->objectName(), "reader");
         }
 
         nbReadersAccessing++;
@@ -64,9 +64,9 @@ public:
         monitorIn();
         nbWriters++;
         while (reading || writing) {
-            wlInstance->addWaiting(QThread::objectName(), "writer");
+            wlInstance->addWaiting(QThread::currentThread()->objectName(), "writer");
             wait(writer);
-            wlInstance->removeWaiting(QThread::objectName(), "writer");
+            wlInstance->removeWaiting(QThread::currentThread()->objectName(), "writer");
         }
         writing = true;
         monitorOut();
