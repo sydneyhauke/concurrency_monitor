@@ -27,10 +27,10 @@ protected:
     WaitingLogger *wlInstance;
 public:
     readerwriterpriowritermut() :
-        mutexReaders(1),
-        mutexWriters(1),
-        writer(1),
-        reader(1),
+        mutexReaders(),
+        mutexWriters(),
+        writer(),
+        reader(),
         writing(false),
         nbReaders(0),
         nbWriters(0)

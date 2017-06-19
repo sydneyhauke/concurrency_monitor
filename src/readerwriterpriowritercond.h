@@ -10,6 +10,7 @@
 
 #include "ireaderwriter.h"
 #include "waitinglogger.h"
+#include "owaitcondition.h"
 
 #include <QThread>
 
@@ -20,17 +21,17 @@ protected:
     OWaitCondition writer;
     OMutex mutex;
     int nbWriters, nbReaders;
-    bool readerAccessing;
+    bool writerAccessing;
 
     WaitingLogger *wlInstance;
 
 public:
     readerwriterpriowritercond() :
-        mutex(1),
+        mutex(),
         nbWriters(0),
         nbReaders(0),
-        reader(0),
-        writer(0),
+        reader(),
+        writer(),
         writerAccessing(false)
     {
         wlInstance = WaitingLogger::getInstance();

@@ -29,9 +29,9 @@ protected:
 public:
 
     readerwriterequalhoare() :
-        fifo(1),
+        fifo(),
         nbReaders(0),
-        accessing(1),
+        accessing(),
         writing(false),
         firstWriter(true)
     {

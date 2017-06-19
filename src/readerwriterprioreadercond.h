@@ -10,6 +10,7 @@
 
 #include "ireaderwriter.h"
 #include "waitinglogger.h"
+#include "owaitcondition.h"
 
 #include <QThread>
 
@@ -27,7 +28,7 @@ protected:
 public:
 
     readerwriterprioreadercond() :
-        mutex(1),
+        mutex(),
         nbWriters(0),
         nbReaders(0),
         writerAccessing(false)

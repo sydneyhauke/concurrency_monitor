@@ -12,7 +12,7 @@
 #include "omutex.h"
 #include "waitinglogger.h"
 
-#include <vector>
+#include <QVector>
 #include <algorithm>
 #include <QThread>
 
@@ -22,7 +22,7 @@ protected:
     OMutex mutex;
     OMutex accessor;
     int nbReaders;
-    std::vector<int> waitingIds;
+    QVector<int> waitingIds;
     int currentId;
     int toRealeaseId;
     bool readerAccessing;
@@ -33,8 +33,8 @@ protected:
 public:
 
     readerwriterequalmut() :
-        mutex(1),
-        accessor(1),
+        mutex(),
+        accessor(),
         nbReaders(0),
         currentId(0),
         toRealeaseId(-1),
@@ -70,7 +70,7 @@ public:
 
         if (waitingIds.size() > 0) {
             toRealeaseId = waitingIds[0];
-            waitingIds.erase(0);
+            waitingIds.remove(0);
             accessor.unlock();
         } else if (nbReaders == 0) {
             readerAccessing = false;
@@ -97,7 +97,7 @@ public:
 
         mutex.unlock();
         wlInstance->addWaiting(QThread::currentThread()->objectName(), "writer");
-        writer.lock();
+        accessor.lock();
         wlInstance->removeWaiting(QThread::currentThread()->objectName(), "writer");
     }
 

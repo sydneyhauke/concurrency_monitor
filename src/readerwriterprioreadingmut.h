@@ -13,6 +13,7 @@
 #include "omutex.h"
 #include "waitinglogger.h"
 
+#include <QVector>
 #include <QThread>
 
 class readerwriterprioreadingmut : public IReaderWriter {
@@ -20,7 +21,7 @@ protected:
     OMutex mutex;
     OMutex accessor;
     int nbReaders;
-    std::vector<int> waitingIds;
+    QVector<int> waitingIds;
     int currentId;
     int toRealeaseId;
     bool readerAccessing;
@@ -31,8 +32,8 @@ protected:
 public:
 
     readerwriterprioreadingmut() :
-        mutex(1),
-        accessor(1),
+        mutex(),
+        accessor(),
         nbReaders(0),
         currentId(0),
         toRealeaseId(-1),
@@ -62,7 +63,7 @@ public:
 
         // Si on est dans le cas où un reader est en train d'accéder
         if (readerAccessing) {
-            waitingIds.erase(std::find(waitingIds.begin(), waitingIds.end(), id));
+            waitingIds.erase(std::find(waitingIds.begin(), waitingIds.end(), currentId));
         }
 
         first = false;
@@ -78,7 +79,7 @@ public:
 
         if (waitingIds.size() > 0) {
             toRealeaseId = waitingIds[0];
-            waitingIds.erase(0);
+            waitingIds.remove(0);
             accessor.unlock();
         } else if (nbReaders == 0) {
             readerAccessing = false;

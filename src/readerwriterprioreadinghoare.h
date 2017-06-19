@@ -22,8 +22,8 @@ protected:
 
 public:
     readerwriterprioreadinghoare():
-        fifo(1),
-        accessor(1),
+        fifo(),
+        accessor(),
         nbReaders(0),
         nbWriters(0),
         freeAllReaders(false)
