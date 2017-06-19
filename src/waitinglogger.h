@@ -1,3 +1,12 @@
+/**
+  \file waitinglogger.h
+  \author Sydney Hauke, Thuy-My Tran, Yosra Harbaoui et Denise Gemesio
+  \date 19.06.2017
+  \brief Single instance class that registers threads accessing one or more waiting queues
+  or a resource. Enables the user to display the content of a all waiting queues and the resource.
+  We display the contents when a thread accesses the resource.
+*/
+
 #ifndef WAITINGLOGGER_H
 #define WAITINGLOGGER_H
 
@@ -73,10 +82,10 @@ protected:
      */
     virtual void updateView();
 
-    QStringList resourceAccesses;
+    QStringList resourceAccesses; // List of all threads in resource
 
 private:
-    QMutex mutex;
+    QMutex mutex; // Provides mutual exclusion to *resourceAccesses*
 };
 
 #endif // WAITINGLOGGER_H

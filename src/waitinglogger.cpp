@@ -4,8 +4,6 @@
 
 WaitingLogger::WaitingLogger() {}
 
-
-
 WaitingLogger *WaitingLogger::getInstance()
 {
     static WaitingLogger *instance = new ReadWriteLogger();
@@ -20,7 +18,7 @@ QList<WaitingQueue *> WaitingLogger::getQueues() const
 }
 
 /**
- * @brief WaitingLogger::addWaiting Adds a thread to a waiting queue. If the waiting doesn't already
+ * @brief WaitingLogger::addWaiting Adds a thread to a waiting queue. If the waiting queue doesn't already
  * exist, it is created.
  * @param threadName A thread name to add in a waiting queue
  * @param objectName A name of the waiting queue
@@ -30,7 +28,9 @@ void WaitingLogger::addWaiting(const QString& threadName, const QString& objectN
     bool found = false;
     WaitingQueue *wq;
 
-    // Check if corresponding waiting queue already exists
+    /* Check if corresponding waiting queue already exists.
+     * NOTE : could use a HashMap instead. Optimisation from O(N) to O(1)
+     */
     for(QList<WaitingQueue *>::iterator it = waitingQueues.begin(); it != waitingQueues.end(); it++) {
         if((*it)->name == objectName) {
             found = true;
@@ -63,7 +63,10 @@ void WaitingLogger::removeWaiting(const QString& threadName, const QString& obje
     bool found = false;
     WaitingQueue *wq;
 
-    // Check if waiting queue exists
+
+    /* Check if corresponding waiting queue already exists.
+     * NOTE : could use a HashMap instead. Optimisation from O(N) to O(1)
+     */
     for(QList<WaitingQueue *>::iterator it = waitingQueues.begin(); it != waitingQueues.end(); it++) {
         if((*it)->name == objectName) {
             found = true;
@@ -79,7 +82,9 @@ void WaitingLogger::removeWaiting(const QString& threadName, const QString& obje
     mutex.unlock();
 }
 
-
+/**
+ * @brief WaitingLogger::updateView Displays waiting queues and their threads that have been registered
+ */
 void WaitingLogger::updateView()
 {
     for(QList<WaitingQueue *>::iterator itQueue = waitingQueues.begin(); itQueue != waitingQueues.end(); itQueue++) {
@@ -125,6 +130,9 @@ void ReadWriteLogger::removeResourceAccess(const QString &threadName)
     mutex.unlock();
 }
 
+/**
+ * @brief ReadWriteLogger::updateView Displays all threads that are in resource
+ */
 void ReadWriteLogger::updateView()
 {
     std::cout << "In resource : ";

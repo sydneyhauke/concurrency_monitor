@@ -1,3 +1,11 @@
+/**
+  \file osemaphore.h
+  \author Sydney Hauke, Thuy-My Tran, Yosra Harbaoui et Denise Gemesio
+  \date 19.06.2017
+  \brief Decorator declaration of a Semaphore. Adds some functionnalities, like
+  getting the state of the semaphore instance.
+*/
+
 #ifndef PSEMAPHORE_H
 #define PSEMAPHORE_H
 

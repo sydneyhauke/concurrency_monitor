@@ -1,3 +1,10 @@
+/**
+  \file ohoaremonitor.h
+  \author Sydney Hauke, Thuy-My Tran, Yosra Harbaoui et Denise Gemesio
+  \date 19.06.2017
+  \brief Decorator declaration of a HoareMonitor.
+*/
+
 #ifndef OHOAREMONITOR_H
 #define OHOAREMONITOR_H
 

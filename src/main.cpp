@@ -10,7 +10,6 @@
   *
 */
 
-
 #include <QApplication>
 #include <QThread>
 #include <iostream>
@@ -19,17 +18,17 @@
 
 #include "synchrocontroller.h"
 
-/*#include "readerwriterequalcond.h"
+#include "readerwriterequalcond.h"
 #include "readerwriterequalhoare.h"
 #include "readerwriterequalmut.h"
 #include "readerwriterequalsem.h"
 
 #include "readerwriterprioreadercond.h"
 #include "readerwriterprioreaderhoare.h"
-#include "readerwriterprioreadermut.h"*/
+#include "readerwriterprioreadermut.h"
 #include "readerwriterprioreadersem.h"
 
-/*#include "readerwriterprioreadingcond.h"
+#include "readerwriterprioreadingcond.h"
 #include "readerwriterprioreadinghoare.h"
 #include "readerwriterprioreadingmut.h"
 #include "readerwriterprioreadingsem.h"
@@ -37,7 +36,7 @@
 #include "readerwriterpriowritercond.h"
 #include "readerwriterpriowriterhoare.h"
 #include "readerwriterpriowritermut.h"
-#include "readerwriterpriowritersem.h"*/
+#include "readerwriterpriowritersem.h"
 
 #include "ireaderwriter.h"
 #include "waitinglogger.h"
@@ -45,6 +44,12 @@
 #define NB_READERS 2
 #define NB_WRITERS 3
 
+/**
+ * @brief The Writer class
+ *
+ * Simple thread class that acts as a writer on a resource. Accesses and exits resources
+ * at randome times.
+ */
 class Writer : public QThread {
 private :
     IReaderWriter *_resource;
@@ -66,12 +71,12 @@ public:
             }
             sem.release();
 
-            _resource->lockWriter();
+            _resource->lockWriter(); // Access resource
             ((ReadWriteLogger*)ReadWriteLogger::getInstance())->addResourceAccess(this->objectName());
 
             usleep((int)((float)600000*rand()/(RAND_MAX+1.0)));
 
-            _resource->unlockWriter();
+            _resource->unlockWriter(); // Exits resource
             ((ReadWriteLogger*)ReadWriteLogger::getInstance())->removeResourceAccess(this->objectName());
 
             usleep((int)((float)600000*rand()/(RAND_MAX+1.0)));
@@ -84,7 +89,8 @@ QSemaphore Writer::sem(1);
 /**
  * @brief The Reader class
  *
- * Simple thread class that acts as a reader on a resource
+ * Simple thread class that acts as a reader on a resource. Accesses and exits resources
+ * at randome times.
  */
 class Reader : public QThread {
 private:
@@ -107,12 +113,12 @@ public:
             }
             sem.release();
 
-            _resource->lockReader();
+            _resource->lockReader(); // Access resource
             ((ReadWriteLogger*)ReadWriteLogger::getInstance())->addResourceAccess(this->objectName());
 
             usleep((int)((float)600000*rand()/(RAND_MAX+1.0)));
 
-            _resource->unlockReader();
+            _resource->unlockReader(); // Exits resource
             ((ReadWriteLogger*)ReadWriteLogger::getInstance())->removeResourceAccess(this->objectName());
 
             usleep((int)((float)600000*rand()/(RAND_MAX+1.0)));
@@ -124,8 +130,6 @@ QSemaphore Reader::sem(1);
 
 int main(int argc, char *argv[])
 {
-    int input;
-
     Reader* readerThreads[NB_READERS];
     Writer* writerThreads[NB_WRITERS];
 
@@ -157,6 +161,7 @@ int main(int argc, char *argv[])
     }
 
     bool continuing = true;
+    int input;
 
     while (continuing) {
         // Wait for a key press
