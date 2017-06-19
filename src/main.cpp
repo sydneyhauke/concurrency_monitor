@@ -7,6 +7,8 @@
 
 #include "synchrocontroller.h"
 #include "readerwriterprioreadersem.h"
+#include "readerwriterprioreadermut.h"
+#include "readerwriterprioreaderhoare.h"
 #include "ireaderwriter.h"
 #include "waitinglogger.h"
 
@@ -65,7 +67,7 @@ int main(int argc, char *argv[])
     Writer* writerThreads[NB_WRITERS];
 
     // Create the resource manager object
-    IReaderWriter *resource = new readerwriterprioreaderSem();
+    IReaderWriter *resource = new readerwriterprioreaderhoare();
 
     // Create the threads
     for(size_t i = 0; i < NB_READERS; i++) {

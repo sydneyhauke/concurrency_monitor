@@ -3,7 +3,10 @@
 
 #include "ireaderwriter.h"
 #include "omutex.h"
+#include "waitinglogger.h"
+
 #include <vector>
+#include <QThread>
 
 class readerwriterequalmut : public IReaderWriter
 {
@@ -15,6 +18,8 @@ protected:
     int currentId;
     int toRealeaseId;
 
+    WaitingLogger *wlInstance;
+
 public:
 
     readerwriterequalmut() :
@@ -23,7 +28,9 @@ public:
         nbReaders(0),
         currentId(0),
         toRealeaseId(-1)
-    {}
+    {
+        wlInstance = WaitingLogger::getInstance();
+    }
 
     virtual void lockReader() {
         mutex.lock();
@@ -56,7 +63,9 @@ public:
     }
 
     virtual void lockWriter() {
+        wlInstance->addWaiting(QThread::objectName(), "writer");
         writer.lock();
+        wlInstance->removeWaiting(QThread::objectName(), "writer");
     }
 
     virtual void unlockWriter() {
