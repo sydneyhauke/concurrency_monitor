@@ -33,23 +33,23 @@ public:
     }
 
     virtual void lockReader() {
-        wlInstance->addWaiting(QThread::objectName(), "mutexReaders");
+        wlInstance->addWaiting(QThread::currentThread()->objectName(), "mutexReaders");
         mutexReaders.acquire();
-        wlInstance->removeWaiting(QThread::objectName(), "mutexReaders");
+        wlInstance->removeWaiting(QThread::currentThread()->objectName(), "mutexReaders");
 
-        wlInstance->addWaiting(QThread::objectName(), "reader");
+        wlInstance->addWaiting(QThread::currentThread()->objectName(), "reader");
         reader.acquire();
-        wlInstance->removeWaiting(QThread::objectName(), "reader");
+        wlInstance->removeWaiting(QThread::currentThread()->objectName(), "reader");
 
-        wlInstance->addWaiting(QThread::objectName(), "mutex");
+        wlInstance->addWaiting(QThread::currentThread()->objectName(), "mutex");
         mutex.acquire();
-        wlInstance->removeWaiting(QThread::objectName(), "mutex");
+        wlInstance->removeWaiting(QThread::currentThread()->objectName(), "mutex");
 
         nbReaders++;
         if (nbReaders == 1) {
-            wlInstance->addWaiting(QThread::objectName(), "writer");
+            wlInstance->addWaiting(QThread::currentThread()->objectName(), "writer");
             writer.acquire();
-            wlInstance->removeWaiting(QThread::objectName(), "writer");
+            wlInstance->removeWaiting(QThread::currentThread()->objectName(), "writer");
         }
         mutex.release();
         reader.release();
@@ -66,21 +66,21 @@ public:
     }
 
     virtual void lockWriter() {
-        wlInstance->addWaiting(QThread::objectName(), "mutexWriters");
+        wlInstance->addWaiting(QThread::currentThread()->objectName(), "mutexWriters");
         mutexWriters.acquire();
-        wlInstance->removeWaiting(QThread::objectName(), "mutexWriters");
+        wlInstance->removeWaiting(QThread::currentThread()->objectName(), "mutexWriters");
 
         nbWriters++;
         if (nbWriters == 1) {
-            wlInstance->addWaiting(QThread::objectName(), "reader");
+            wlInstance->addWaiting(QThread::currentThread()->objectName(), "reader");
             reader.acquire();
-            wlInstance->removeWaiting(QThread::objectName(), "reader");
+            wlInstance->removeWaiting(QThread::currentThread()->objectName(), "reader");
         }
         mutexWriters.release();
 
-        wlInstance->addWaiting(QThread::objectName(), "writer");
+        wlInstance->addWaiting(QThread::currentThread()->objectName(), "writer");
         writer.acquire();
-        wlInstance->removeWaiting(QThread::objectName(), "writer");
+        wlInstance->removeWaiting(QThread::currentThread()->objectName(), "writer");
     }
 
     virtual void unlockWriter() {

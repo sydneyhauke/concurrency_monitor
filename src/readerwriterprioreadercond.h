@@ -2,6 +2,9 @@
 #define READERWRITERPRIOREADERCOND_H
 
 #include "ireaderwriter.h"
+#include "waitinglogger.h"
+
+#include <QThread>
 
 class readerwriterprioreadercond : public IReaderWriter
 {
@@ -12,6 +15,8 @@ protected:
     int nbWriters, nbReaders;
     bool writerAccessing;
 
+    WaitingLogger *wlInstance;
+
 public:
 
     readerwriterprioreadercond() :
@@ -19,9 +24,12 @@ public:
         nbWriters(0),
         nbReaders(0),
         writerAccessing(false)
-    {}
+    {
+        wlInstance = WaitingLogger::getInstance();
+    }
 
     virtual void lockReader() {
+        wlInstance->addWaiting();
         mutex.lock();
         nbReaders++;
         if (writerAccessing) {

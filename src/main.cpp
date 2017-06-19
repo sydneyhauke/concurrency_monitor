@@ -6,9 +6,27 @@
 #include <sstream>
 
 #include "synchrocontroller.h"
-#include "readerwriterprioreadersem.h"
-#include "readerwriterprioreadermut.h"
+
+#include "readerwriterequalcond.h"
+#include "readerwriterequalhoare.h"
+#include "readerwriterequalmut.h"
+#include "readerwriterequalsem.h"
+
+#include "readerwriterprioreadercond.h"
 #include "readerwriterprioreaderhoare.h"
+#include "readerwriterprioreadermut.h"
+#include "readerwriterprioreadersem.h"
+
+#include "readerwriterprioreadingcond.h"
+#include "readerwriterprioreadinghoare.h"
+#include "readerwriterprioreadingmut.h"
+#include "readerwriterprioreadingsem.h"
+
+#include "readerwriterpriowritercond.h"
+#include "readerwriterpriowriterhoare.h"
+#include "readerwriterpriowritermut.h"
+#include "readerwriterpriowritersem.h"
+
 #include "ireaderwriter.h"
 #include "waitinglogger.h"
 

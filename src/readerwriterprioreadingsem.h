@@ -30,15 +30,15 @@ public:
     }
 
     virtual void lockReader() {
-        wlInstance->addWaiting(QThread::objectName(), "mutex");
+        wlInstance->addWaiting(QThread::currentThread()->objectName(), "mutex");
         mutex.acquire();
-        wlInstance->removeWaiting(QThread::objectName(), "mutex");
+        wlInstance->removeWaiting(QThread::currentThread()->objectName(), "mutex");
 
         nbReaders++;
         if (nbReaders == 1) {
-            wlInstance->addWaiting(QThread::objectName(), "accessor");
+            wlInstance->addWaiting(QThread::currentThread()->objectName(), "accessor");
             accessor.acquire();
-            wlInstance->addWaiting(QThread::objectName(), "accessor");
+            wlInstance->addWaiting(QThread::currentThread()->objectName(), "accessor");
         }
         mutex.release();
     }
@@ -53,9 +53,9 @@ public:
     }
 
     virtual void lockWriter() {
-        wlInstance->addWaiting(QThread::objectName(), "accessor");
+        wlInstance->addWaiting(QThread::currentThread()->objectName(), "accessor");
         accessor.acquire();
-        wlInstance->addWaiting(QThread::objectName(), "accessor");
+        wlInstance->addWaiting(QThread::currentThread()->objectName(), "accessor");
     }
 
     virtual void unlockWriter() {

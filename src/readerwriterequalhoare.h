@@ -44,17 +44,17 @@ public:
 
     virtual void lockReader() {
         if (!firstReader || !firstWriter ) {
-            wlInstance->addWaiting(QThread::objectName(), "fifo");
+            wlInstance->addWaiting(QThread::currentThread()->objectName(), "fifo");
             wait(fifo);
-            wlInstance->removeWaiting(QThread::objectName(), "fifo");
+            wlInstance->removeWaiting(QThread::currentThread()->objectName(), "fifo");
         }
         firstReader = false;
         monitorIn();
         nbReaders++;
         while (nbReaders == 1 && writing) {
-            wlInstance->addWaiting(QThread::objectName(), "accessing");
+            wlInstance->addWaiting(QThread::currentThread()->objectName(), "accessing");
             wait(accessing);
-            wlInstance->removeWaiting(QThread::objectName(), "accessing");
+            wlInstance->removeWaiting(QThread::currentThread()->objectName(), "accessing");
         }
         monitorOut();
         signal(fifo);
@@ -71,16 +71,16 @@ public:
 
     virtual void lockWriter() {
         if (!firstWriter || !firstReader) {
-            wlInstance->addWaiting(QThread::objectName(), "fifo");
+            wlInstance->addWaiting(QThread::currentThread()->objectName(), "fifo");
             wait(fifo);
-            wlInstance->removeWaiting(QThread::objectName(), "fifo");
+            wlInstance->removeWaiting(QThread::currentThread()->objectName(), "fifo");
         }
         firstWriter = false;
         monitorIn();
         if (nbReaders > 0) {
-            wlInstance->addWaiting(QThread::objectName(), "accessing");
+            wlInstance->addWaiting(QThread::currentThread()->objectName(), "accessing");
             wait(accessing);
-            wlInstance->removeWaiting(QThread::objectName(), "accessing");
+            wlInstance->removeWaiting(QThread::currentThread()->objectName(), "accessing");
         }
         writing = true;
         monitorOut();

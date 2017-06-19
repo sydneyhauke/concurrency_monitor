@@ -33,13 +33,13 @@ public:
     }
 
     virtual void lockReader() {
-        wlInstance->addWaiting(QThread::objectName(), "fifo");
+        wlInstance->addWaiting(QThread::currentThread()->objectName(), "fifo");
         fifo.acquire();
-        wlInstance->removeWaiting(QThread::objectName(), "fifo");
+        wlInstance->removeWaiting(QThread::currentThread()->objectName(), "fifo");
 
-        wlInstance->addWaiting(QThread::objectName(), "mutex");
+        wlInstance->addWaiting(QThread::currentThread()->objectName(), "mutex");
         mutex.acquire();
-        wlInstance->removeWaiting(QThread::objectName(), "mutex");
+        wlInstance->removeWaiting(QThread::currentThread()->objectName(), "mutex");
 
         nbReaders++;
         mutex.release();
@@ -48,9 +48,9 @@ public:
         mutex.acquire();
 
         if (!first) {
-            wlInstance->addWaiting(QThread::objectName(), "accessor");
+            wlInstance->addWaiting(QThread::currentThread()->objectName(), "accessor");
             accessor.wait(&mutex);
-            wlInstance->removeWaiting(QThread::objectName(), "accessor");
+            wlInstance->removeWaiting(QThread::currentThread()->objectName(), "accessor");
         }
 
         first = false;
@@ -75,14 +75,14 @@ public:
         mutex.acquire();
         nbWriters++;
         mutex.release();
-        wlInstance->addWaiting(QThread::objectName(), "fifo");
+        wlInstance->addWaiting(QThread::currentThread()->objectName(), "fifo");
         fifo.acquire();
-        wlInstance->removeWaiting(QThread::objectName(), "fifo");
+        wlInstance->removeWaiting(QThread::currentThread()->objectName(), "fifo");
 
         if (!first) {
-            wlInstance->addWaiting(QThread::objectName(), "accessor");
+            wlInstance->addWaiting(QThread::currentThread()->objectName(), "accessor");
             accessor.wait(&mutex);
-            wlInstance->removeWaiting(QThread::objectName(), "accessor");
+            wlInstance->removeWaiting(QThread::currentThread()->objectName(), "accessor");
         }
 
         first = false;

@@ -28,19 +28,19 @@ public:
     }
 
     virtual void lockReader() {
-        wlInstance->addWaiting(QThread::objectName(), "fifo");
+        wlInstance->addWaiting(QThread::currentThread()->objectName(), "fifo");
         fifo.acquire();
-        wlInstance->removeWaiting(QThread::objectName(), "fifo");
+        wlInstance->removeWaiting(QThread::currentThread()->objectName(), "fifo");
 
-        wlInstance->addWaiting(QThread::objectName(), "mutex");
+        wlInstance->addWaiting(QThread::currentThread()->objectName(), "mutex");
         mutex.acquire();
-        wlInstance->removeWaiting(QThread::objectName(), "mutex");
+        wlInstance->removeWaiting(QThread::currentThread()->objectName(), "mutex");
 
         nbReaders++;
         if (nbReaders == 1) {
-            wlInstance->addWaiting(QThread::objectName(), "writer");
+            wlInstance->addWaiting(QThread::currentThread()->objectName(), "writer");
             writer.acquire();
-            wlInstance->removeWaiting(QThread::objectName(), "writer");
+            wlInstance->removeWaiting(QThread::currentThread()->objectName(), "writer");
         }
         mutex.release();
         fifo.release();
@@ -56,13 +56,13 @@ public:
     }
 
     virtual void lockWriter() {
-        wlInstance->addWaiting(QThread::objectName(), "fifo");
+        wlInstance->addWaiting(QThread::currentThread()->objectName(), "fifo");
         fifo.acquire();
-        wlInstance->removeWaiting(QThread::objectName(), "fifo");
+        wlInstance->removeWaiting(QThread::currentThread()->objectName(), "fifo");
 
-        wlInstance->addWaiting(QThread::objectName(), "writer");
+        wlInstance->addWaiting(QThread::currentThread()->objectName(), "writer");
         writer.acquire();
-        wlInstance->removeWaiting(QThread::objectName(), "writer");
+        wlInstance->removeWaiting(QThread::currentThread()->objectName(), "writer");
     }
 
     virtual void unlockWriter() {
