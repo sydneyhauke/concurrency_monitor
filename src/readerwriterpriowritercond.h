@@ -2,6 +2,9 @@
 #define READERWRITERPRIOWRITERCOND_H
 
 #include "ireaderwriter.h"
+#include "waitinglogger.h"
+
+#include <QThread>
 
 class readerwriterpriowritercond : public IReaderWriter
 {
@@ -12,6 +15,8 @@ protected:
     int nbWriters, nbReaders;
     bool readerAccessing;
 
+    WaitingLogger *wlInstance;
+
 public:
     readerwriterpriowritercond() :
         mutex(1),
@@ -20,13 +25,20 @@ public:
         reader(0),
         writer(0),
         writerAccessing(false)
-    {}
+    {
+        wlInstance = WaitingLogger::getInstance();
+    }
 
     virtual void lockReader() {
+        wlInstance->addWaiting(QThread::objectName(), "mutex");
         mutex.lock();
+        wlInstance->removeWaiting(QThread::objectName(), "mutex");
+
         nbReaders++;
         while (nbWriters > 0 || writerAccessing) {
+            wlInstance->addWaiting(QThread::objectName(), "reader");
             reader.wait(&mutex);
+            wlInstance->removeWaiting(QThread::objectName(), "reader");
         }
         mutex.unlock();
     }
@@ -45,10 +57,15 @@ public:
     }
 
     virtual void lockWriter() {
+        wlInstance->addWaiting(QThread::objectName(), "mutex");
         mutex.lock();
+        wlInstance->removeWaiting(QThread::objectName(), "mutex");
+
         nbWriters++;
         if (writerAccessing) {
+            wlInstance->addWaiting(QThread::objectName(), "writer");
             writer.wait(&mutex);
+            wlInstance->removeWaiting(QThread::objectName(), "writer");
         }
         writerAccessing = true;
         mutex.unlock();
