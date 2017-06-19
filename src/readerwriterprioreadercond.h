@@ -29,7 +29,6 @@ public:
     }
 
     virtual void lockReader() {
-        wlInstance->addWaiting();
         mutex.lock();
         nbReaders++;
         if (writerAccessing) {

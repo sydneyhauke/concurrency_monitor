@@ -89,9 +89,9 @@ public:
         first = false;
 
         mutex.unlock();
-        wlInstance->addWaiting(QThread::objectName(), "writer");
+        wlInstance->addWaiting(QThread::currentThread()->objectName(), "writer");
         writer.lock();
-        wlInstance->removeWaiting(QThread::objectName(), "writer");
+        wlInstance->removeWaiting(QThread::currentThread()->objectName(), "writer");
     }
 
     virtual void unlockWriter() {
